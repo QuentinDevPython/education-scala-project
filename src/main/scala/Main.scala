@@ -52,38 +52,3 @@ enum Constraint[A]:
 //     and a set of constraints on those variables
 case class CSP[A](domains: Map[Variable[A], Domain[A]], constraints: Set[Constraint[A]]):
   def solve: Map[Variable[A], Domain[A]] = ???
-
-// Set of available colors
-enum Color:
-  case RED, BLUE, YELLOW, GREEN
-
-// Domain for colors
-val ColorDomain: Domain[Color] = Domain(Color.values.toSet)
-
-// our variables (you should indicates that they are of type Color)
-val Paris           = Variable[Color]("P")
-val HautDeSeine     = Variable[Color]("HS")
-val SeineSaintDenis = Variable[Color]("SSD")
-val ValDeMarne      = Variable[Color]("VDM")
-val SeineEtMarne    = Variable[Color]("SM")
-
-// The CSP representation for map coloration problem
-val colorCsp: CSP[Color] =
-  CSP(
-    domains =
-    // Each variable is bound tothe same domain
-      Map(
-        Paris           -> ColorDomain,
-        HautDeSeine     -> ColorDomain,
-        SeineSaintDenis -> ColorDomain,
-        ValDeMarne      -> ColorDomain,
-        SeineEtMarne    -> ColorDomain
-      ),
-    constraints =
-      Set(
-        AllDiff(List(Paris, HautDeSeine, SeineSaintDenis, ValDeMarne)),
-        AllDiff(List(SeineSaintDenis, ValDeMarne, SeineEtMarne)),
-        EqualConstant(Paris, Color.RED),
-        EqualConstant(SeineEtMarne, Color.YELLOW)
-      )
-  )
