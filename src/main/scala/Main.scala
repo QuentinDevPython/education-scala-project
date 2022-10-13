@@ -46,11 +46,11 @@ def main: Unit =
         case Constraint.EqualConstant(x, c) =>
           are_domains_equal(domains(x), Domain(Set(c)))
 
-        case Contraint.DiffVariables(x, y) =>
-          !(are_domains_equal(domains(x), domains(y)))
+        case Constraint.DiffVariables(x, y) =>
+          are_domains_different(domains(x), domains(y))
 
-        case Contraint.DiffConstant(x, c) =>
-          !(are_domains_equal(domains(x), Domain(Set(c))))
+        case Constraint.DiffConstant(x, c) =>
+          are_domains_different(domains(x), Domain(Set(c)))
 
         case _ => true
 
@@ -67,11 +67,11 @@ def main: Unit =
           Map(x -> set_domains_equal(domains(x), Domain(Set(c))))
 
         case Constraint.DiffVariables(x, y) =>
-          val newDomain: Domain[A] = set_domains_different(domains(x), domains(y))
-          Map(x -> newDomain, y -> newDomain)
+          val newDomain: List[Domain[A]] = set_domains_different(domains(x), domains(y))
+          Map(x -> newDomain.head, y -> newDomain.tail.head)
         
-        case Contraint.DiffConstant(x, c) =>
-          Map(x -> set_domains_different(domains(x), Domain(Set(c))))
+        case Constraint.DiffConstant(x, c) =>
+          Map(x -> set_domains_different_constant(domains(x), Domain(Set(c))))
 
         case _ => Map() // Contrainte inconnue
 
@@ -86,15 +86,25 @@ def main: Unit =
       x.intersect(y)
 
     
-    def set_domains_different(x: Domain[A], y: Domain[A]): Domain[A]
-      // Renvoie 
-      // Deux cas :
-      // Les deux variables ne possèdent qu'une seule valeur => Il faut que les valeurs soient différentes
-      // Au moins une des deux variables possède deux valeurs => Il y a forcément une solution
+    def set_domains_different(x: Domain[A], y: Domain[A]): List[Domain[A]] =
+      // Renvoie une liste des domaines x et y
+      if (x.isSingleton) List(x, y.diff(x))
+        
+      else if (y.isSingleton) List(x.diff(y), y)
+      
+      else List(x, y)
+
+    def set_domains_different_constant(x: Domain[A], y: Domain[A]): Domain[A] =
+      x.diff(y)
 
     def are_domains_equal(x: Domain[A], y: Domain[A]): Boolean =
       // True si les domaines sont égaux
       x.values.equals(y.values)
+
+    
+    def are_domains_different(x: Domain[A], y: Domain[A]): Boolean =
+      if (x.isSingleton || y.isSingleton) x.intersect(y).isEmpty
+      else true
 
 
   //TESTS
@@ -117,8 +127,10 @@ def main: Unit =
         ),
       constraints =
         Set(
-          Constraint.EqualVariables(v1,v2),
-          Constraint.EqualConstant(v2,2)
+          Constraint.EqualVariables(v1,v3),
+          Constraint.EqualConstant(v2,2),
+          Constraint.DiffVariables(v1, v2),
+          Constraint.DiffConstant(v1, 1)
         )
     )
   print(colorCsp.solve)
