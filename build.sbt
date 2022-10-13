@@ -3,14 +3,32 @@ val scala3Version = "3.2.0"
 lazy val root = project
   .in(file("."))
   .settings(
-    name := "My beautiful project", // TODO: name your project
+    name := "Constraint solver",
     version := "0.1.0-SNAPSHOT",
-    developers := List( // TODO: replace the following developer by your team developers
+    developers := List(
       Developer(
-        id    = "johndoe",
-        name  = "John Doe",
-        email = "john.doe@gmail.com",
-        url   = url("https://github.com/johndoe")
+        id    = "maxime",
+        name  = "Maxime Bourgain",
+        email = "maxime.bourgain@edu.esiee.fr",
+        url   = url("https://github.com/Maxime200")
+      ),
+      Developer(
+        id    = "baptiste",
+        name  = "Baptiste Bontoux",
+        email = "baptiste.bontoux@edu.esiee.fr",
+        url   = url("https://github.com/BaptisteBtx")
+      ),
+      Developer(
+        id    = "quentin",
+        name  = "Quentin Barthélémy",
+        email = "quentin.barthelemy@edu.esiee.fr",
+        url   = url("https://github.com/QuentinDevPython/")
+      ),
+      Developer(
+        id    = "clement",
+        name  = "Clément Boudou",
+        email = "clement.boudou@edu.esiee.fr",
+        url   = url("https://github.com/clementB94")
       )
     ),
     scalaVersion := scala3Version,
