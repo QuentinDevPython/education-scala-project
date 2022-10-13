@@ -15,6 +15,7 @@ def main: Unit =
     def isEmpty: Boolean = values.isEmpty
     def isSingleton: Boolean = values.size == 1
 
+
   case class Variable[A](name: String)
 
   enum Constraint[A]:
@@ -23,8 +24,6 @@ def main: Unit =
     case DiffVariables(x: Variable[A], y: Variable[A])
     case DiffConstant(x: Variable[A], c: A)
     case AllDiff(variables: List[Variable[A]])
-
-
 
 
   case class CSP[A](domains: Map[Variable[A], Domain[A]], constraints: Set[Constraint[A]]):
@@ -37,14 +36,24 @@ def main: Unit =
           val newCSP: CSP[A] = update_domains(apply_constraint(x))
           newCSP.solve
 
+
     def is_satisfied(constraint: Constraint[A]): Boolean =
       // Vérifie si la contrainte est satisfaite ou non
       constraint match
         case Constraint.EqualVariables(x, y) =>
           are_domains_equal(domains(x),domains(y))
+
         case Constraint.EqualConstant(x, c) =>
           are_domains_equal(domains(x), Domain(Set(c)))
+
+        case Contraint.DiffVariables(x, y) =>
+          !(are_domains_equal(domains(x), domains(y)))
+
+        case Contraint.DiffConstant(x, c) =>
+          !(are_domains_equal(domains(x), Domain(Set(c))))
+
         case _ => true
+
 
     def apply_constraint(constraint: Constraint[A]): Map[Variable[A], Domain[A]] =
       // Applique la contrainte aux variables concernées
@@ -53,20 +62,40 @@ def main: Unit =
         case Constraint.EqualVariables(x, y) =>
           val newDomain: Domain[A] = set_domains_equal(domains(x), domains(y))
           Map(x -> newDomain, y -> newDomain)
+
         case Constraint.EqualConstant(x, c) =>
           Map(x -> set_domains_equal(domains(x), Domain(Set(c))))
+
+        case Constraint.DiffVariables(x, y) =>
+          val newDomain: Domain[A] = set_domains_different(domains(x), domains(y))
+          Map(x -> newDomain, y -> newDomain)
+        
+        case Contraint.DiffConstant(x, c) =>
+          Map(x -> set_domains_different(domains(x), Domain(Set(c))))
+
         case _ => Map() // Contrainte inconnue
 
 
     def update_domains(newDomains: Map[Variable[A], Domain[A]]): CSP[A] =
       // Créer un nouvel objet CSP avec les domaines mis a jour
       copy(domains=domains++newDomains)
+
+
     def set_domains_equal(x: Domain[A], y: Domain[A]): Domain[A] =
-      // Renvoie l'intersection des domain x et y
+      // Renvoie l'intersection des domaines x et y
       x.intersect(y)
-    def are_domains_equal(x:Domain[A], y:Domain[A]): Boolean =
+
+    
+    def set_domains_different(x: Domain[A], y: Domain[A]): Domain[A]
+      // Renvoie 
+      // Deux cas :
+      // Les deux variables ne possèdent qu'une seule valeur => Il faut que les valeurs soient différentes
+      // Au moins une des deux variables possède deux valeurs => Il y a forcément une solution
+
+    def are_domains_equal(x: Domain[A], y: Domain[A]): Boolean =
       // True si les domaines sont égaux
       x.values.equals(y.values)
+
 
   //TESTS
   val dom1: Domain[Int] = Domain[Int](Set(1, 2, 3))
