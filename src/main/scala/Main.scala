@@ -26,13 +26,15 @@ def main: Unit =
     case AllDiff(variables: List[Variable[A]])
 
 
-  case class CSP[A](domains: Map[Variable[A], Domain[A]], constraints: Set[Constraint[A]]):
+  case class CSP[A](domains: Map[Variable[A], Domain[A]], constraints: List[Constraint[A]]):
     def solve: Map[Variable[A], Domain[A]] =
       val constraint: Option[Constraint[A]] = constraints.find(c => !is_satisfied(c)) // Cherche la première contrainte non satisfaite
+
       constraint match
         case None => domains // Si elles le sont toutes on a trouvé notre Map
         case Some(x) => // Si une contrainte non satisfaite a été trouvée
           // On créer un nouveau CSP qu'on résout (récursivement)
+          println(x)
           val newCSP: CSP[A] = update_domains(apply_constraint(x))
           newCSP.solve
 
@@ -116,17 +118,18 @@ def main: Unit =
       else true
 
     def map_domains_combinations(domains_list: List[List[A]]): List[List[A]] =
+
       domains_list match
         case Nil => List(List())
         case x :: tail =>
-          val l = map_domains_combinations(tail)
-          x.flatMap(a => l.map(e => a :: e))
+          x.flatMap(a => map_domains_combinations(tail).map(e => a :: e)).filter(l => l.toSet.size == l.size)
+          //res = res.filter(l => l.toSet.size == l.size)
+          //res
 
     def set_all_domains_diff(domains_list: List[Domain[A]]): List[Domain[A]] =
       val all_combinations = map_domains_combinations(domains_list.map(d => d.values.toList))
-      val combinations_all_different = all_combinations.filter(l => l.toSet.size == l.size)
-      val new_domains = combinations_all_different.transpose.map(l => Domain(l.toSet))
-      new_domains
+      //val combinations_all_different = all_combinations.filter(l => l.toSet.size == l.size)
+      all_combinations.transpose.map(l => Domain(l.toSet))
 
 
 
@@ -150,7 +153,7 @@ def main: Unit =
           v3 -> dom3
         ),
       constraints =
-        Set(
+        List(
           //Constraint.EqualVariables(v1,v3),
           //Constraint.EqualConstant(v2,2),
           //Constraint.DiffVariables(v1, v2),
@@ -159,7 +162,8 @@ def main: Unit =
           Constraint.EqualConstant(v2, 2)
         )
     )
-  println(colorCsp.solve)
+  //println(colorCsp.solve)
+  //print("\n")
 
 
 
@@ -383,7 +387,7 @@ def main: Unit =
           v99 -> possibilities_domain,
         ),
       constraints =
-        Set(
+        List(
           // Initilizing the sudoku grid
 
           // All the 1 values
