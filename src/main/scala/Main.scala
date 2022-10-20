@@ -97,17 +97,6 @@ def main: Unit =
     def set_domains_different_constant(x: Domain[A], y: Domain[A]): Domain[A] =
       x.diff(y)
 
-    def set_domains_different_multi(listDomains: List[Domain[A]]): List[Domain[A]] =
-      var listResult : List[Domain[A]] = listDomains
-      for( x <- 0 to listDomains.length - 1){
-        for( y <- x+1 to listDomains.length){
-          val listTemp : List[Domain[A]] = listResult[x].set_domains_different(listResult[y])
-          listResult[x] = listTemp.head
-          listResult[y] = listTemp.tail.head
-        }
-      }
-      listResult
-
     def are_domains_equal(x: Domain[A], y: Domain[A]): Boolean =
     // True si les domaines sont égaux
       x.values.equals(y.values)
