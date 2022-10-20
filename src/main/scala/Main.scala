@@ -52,6 +52,11 @@ def main: Unit =
         case Constraint.DiffConstant(x, c) =>
           are_domains_different(domains(x), Domain(Set(c)))
 
+        case Constraint.AllDiff(variables) =>
+          val oldDomains: List[Domain[A]] = variables.map(v => domains(v))
+          val newDomains: List[Domain[A]] = set_all_domains_diff(variables.map(v => domains(v)))
+          newDomains == oldDomains
+
         case _ => true
 
 
@@ -72,6 +77,10 @@ def main: Unit =
 
         case Constraint.DiffConstant(x, c) =>
           Map(x -> set_domains_different_constant(domains(x), Domain(Set(c))))
+
+        case Constraint.AllDiff(variables: List[Variable[A]]) =>
+          val newDomains: List[Domain[A]] = set_all_domains_diff(variables.map(v => domains(v)))
+          variables.zip(newDomains).toMap
 
         case _ => Map() // Contrainte inconnue
 
@@ -106,21 +115,26 @@ def main: Unit =
       if (x.isSingleton || y.isSingleton) x.intersect(y).isEmpty
       else true
 
-    def are_domains_different_multi(listDomains: List[Domain[A]]): Boolean =
-      val totalDomain : Domain[A] = unionListDomain(listDomains)
-      if (listDomains.length <= totalDomain.length) true else false
+    def map_domains_combinations(domains_list: List[List[A]]): List[List[A]] =
+      domains_list match
+        case Nil => List(List())
+        case x :: tail =>
+          val l = map_domains_combinations(tail)
+          x.flatMap(a => l.map(e => a :: e))
 
-    def unionListDomain(listDomains: List[Domain[A]]): Domain[A] =
-      listDomains match
-        case Nil => Domain(Set())
-        case x :: tail => x.union(unionListDomain(tail))
+    def set_all_domains_diff(domains_list: List[Domain[A]]): List[Domain[A]] =
+      val all_combinations = map_domains_combinations(domains_list.map(d => d.values.toList))
+      val combinations_all_different = all_combinations.filter(l => l.toSet.size == l.size)
+      val new_domains = combinations_all_different.transpose.map(l => Domain(l.toSet))
+      new_domains
+
 
 
 
   //TESTS
-  val dom1: Domain[Int] = Domain[Int](Set(1, 2, 3))
-  //val dom2: Domain[Int] = Domain[Int](Set(1, 2, 3))
-  //val dom3: Domain[Int] = Domain[Int](Set(1, 2, 3))
+  val dom1: Domain[Int] = Domain[Int](Set(1, 2, 3, 4))
+  val dom2: Domain[Int] = Domain[Int](Set(2, 3))
+  val dom3: Domain[Int] = Domain[Int](Set(2, 3))
 
   val v1 = Variable[Int]("v1")
   val v2 = Variable[Int]("v2")
@@ -132,15 +146,17 @@ def main: Unit =
       // Each variable is bound to the same domain
         Map(
           v1 -> dom1,
-          v2 -> dom1,
-          v3 -> dom1
+          v2 -> dom2,
+          v3 -> dom3
         ),
       constraints =
         Set(
-          Constraint.EqualVariables(v1,v3),
-          Constraint.EqualConstant(v2,2),
-          Constraint.DiffVariables(v1, v2),
-          Constraint.DiffConstant(v1, 1)
+          //Constraint.EqualVariables(v1,v3),
+          //Constraint.EqualConstant(v2,2),
+          //Constraint.DiffVariables(v1, v2),
+          //Constraint.DiffConstant(v1, 1),
+          Constraint.AllDiff(List(v1, v2, v3)),
+          Constraint.EqualConstant(v2, 2)
         )
     )
   print(colorCsp.solve)
