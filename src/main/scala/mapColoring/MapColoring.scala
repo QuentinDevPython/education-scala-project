@@ -31,6 +31,7 @@ def launch_chosen_map(difficulty: String): Unit =
   else {
     println("Je n'ai pas compris votre choix.")
     val difficulty: String = ask_difficulty_coloring()
+    launch_chosen_map(difficulty)
   }
 
 def initialize_map_coloring_australia(): CSP[String] =
@@ -219,6 +220,7 @@ def initialize_map_coloring_united_states(): CSP[String] =
           Constraint.EqualConstant(michigan, "Blue"),
           Constraint.EqualConstant(wesc_virginia, "Blue"),
           Constraint.EqualConstant(virginia, "Green"),
+          Constraint.EqualConstant(louisiana, "Red"),
 
           // Constraints to solve the map coloring
 

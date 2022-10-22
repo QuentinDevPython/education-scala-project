@@ -16,7 +16,6 @@ case class Domain[A](values: Set[A]):
   def isEmpty: Boolean = values.isEmpty
 
   def isSingleton: Boolean = values.size == 1
-  def toSingleton: Domain[A] = Domain(Set(values.head))
 
   def length: Int = values.size
 
@@ -32,83 +31,75 @@ enum Constraint[A]:
 
 case class CSP[A](domains: Map[Variable[A], Domain[A]], constraints: List[Constraint[A]]):
   def solve: Map[Variable[A], Domain[A]] =
-    val constraint: Option[Constraint[A]] = constraints.find(c => !is_satisfied(c)) // Cherche la première contrainte non satisfaite
+    val constraint: Option[Constraint[A]] = constraints.find(c => !isSatisfied(c)) // Cherche la première contrainte non satisfaite
 
     constraint match
-      case None => // Si toutes les contraintes sont satisfaites
-        val varToReduce = domains.find(!_._2.isSingleton)
-        varToReduce match
-          case Some(v) =>
-            if v._2.isEmpty then Map() // Si le domaine est vide on ne peut pas résoudre les contraintes
-            // Si il reste des domaines à réduire on fixe une valeur et on résout
-            val newCSP: CSP[A] = update_domains(Map(v._1 -> v._2.toSingleton))
-            newCSP.solve
-          case None => domains
+      case None => domains // Si elles le sont toutes on a trouvé notre Map
       case Some(x) => // Si une contrainte non satisfaite a été trouvée
-        // On crée un nouveau CSP qu'on résout (récursivement)
-        val newCSP: CSP[A] = update_domains(apply_constraint(x))
+        // On créer un nouveau CSP qu'on résout (récursivement)
+        val newCSP: CSP[A] = updateDomains(applyConstraint(x))
         newCSP.solve
 
 
-  def is_satisfied(constraint: Constraint[A]): Boolean =
+  def isSatisfied(constraint: Constraint[A]): Boolean =
   // Vérifie si la contrainte est satisfaite ou non
     constraint match
       case Constraint.EqualVariables(x, y) =>
-        are_domains_equal(domains(x), domains(y))
+        areDomainsEqual(domains(x), domains(y))
 
       case Constraint.EqualConstant(x, c) =>
-        are_domains_equal(domains(x), Domain(Set(c)))
+        areDomainsEqual(domains(x), Domain(Set(c)))
 
       case Constraint.DiffVariables(x, y) =>
-        are_domains_different(domains(x), domains(y))
+        areDomainsDifferent(domains(x), domains(y))
 
       case Constraint.DiffConstant(x, c) =>
-        are_domains_different(domains(x), Domain(Set(c)))
+        areDomainsDifferent(domains(x), Domain(Set(c)))
 
       case Constraint.AllDiff(variables) =>
         val oldDomains: List[Domain[A]] = variables.map(v => domains(v))
-        val newDomains: List[Domain[A]] = set_all_domains_diff(variables.map(v => domains(v)))
+        val newDomains: List[Domain[A]] = setAllDomainsDiff(variables.map(v => domains(v)))
         newDomains == oldDomains
 
       case _ => true
 
 
-  def apply_constraint(constraint: Constraint[A]): Map[Variable[A], Domain[A]] =
+  def applyConstraint(constraint: Constraint[A]): Map[Variable[A], Domain[A]] =
   // Applique la contrainte aux variables concernées
   // Renvoie une Map qui permet de mettre à jour les "domains"
     constraint match
       case Constraint.EqualVariables(x, y) =>
-        val newDomain: Domain[A] = set_domains_equal(domains(x), domains(y))
+        val newDomain: Domain[A] = setDomainsEqual(domains(x), domains(y))
         Map(x -> newDomain, y -> newDomain)
 
       case Constraint.EqualConstant(x, c) =>
-        Map(x -> set_domains_equal(domains(x), Domain(Set(c))))
+        Map(x -> setDomainsEqual(domains(x), Domain(Set(c))))
 
       case Constraint.DiffVariables(x, y) =>
-        val newDomain: List[Domain[A]] = set_domains_different(domains(x), domains(y))
+        val newDomain: List[Domain[A]] = setDomainsDifferent(domains(x), domains(y))
         Map(x -> newDomain.head, y -> newDomain.tail.head)
 
       case Constraint.DiffConstant(x, c) =>
-        Map(x -> set_domains_different_constant(domains(x), Domain(Set(c))))
+        Map(x -> setDomainsDifferentConstant(domains(x), Domain(Set(c))))
 
       case Constraint.AllDiff(variables: List[Variable[A]]) =>
-        val newDomains: List[Domain[A]] = set_all_domains_diff(variables.map(v => domains(v)))
+        val newDomains: List[Domain[A]] = setAllDomainsDiff(variables.map(v => domains(v)))
         variables.zip(newDomains).toMap
 
       case _ => Map() // Contrainte inconnue
 
 
-  def update_domains(newDomains: Map[Variable[A], Domain[A]]): CSP[A] =
+  def updateDomains(newDomains: Map[Variable[A], Domain[A]]): CSP[A] =
   // Créer un nouvel objet CSP avec les domaines mis a jour
     copy(domains = domains ++ newDomains)
 
 
-  def set_domains_equal(x: Domain[A], y: Domain[A]): Domain[A] =
+  def setDomainsEqual(x: Domain[A], y: Domain[A]): Domain[A] =
   // Renvoie l'intersection des domaines x et y
     x.intersect(y)
 
 
-  def set_domains_different(x: Domain[A], y: Domain[A]): List[Domain[A]] =
+  def setDomainsDifferent(x: Domain[A], y: Domain[A]): List[Domain[A]] =
   // Renvoie une liste des domaines x et y
     if (x.isSingleton) List(x, y.diff(x))
 
@@ -116,28 +107,25 @@ case class CSP[A](domains: Map[Variable[A], Domain[A]], constraints: List[Constr
 
     else List(x, y)
 
-  def set_domains_different_constant(x: Domain[A], y: Domain[A]): Domain[A] =
+  def setDomainsDifferentConstant(x: Domain[A], y: Domain[A]): Domain[A] =
     x.diff(y)
 
-  def are_domains_equal(x: Domain[A], y: Domain[A]): Boolean =
+  def areDomainsEqual(x: Domain[A], y: Domain[A]): Boolean =
   // True si les domaines sont égaux
     x.values.equals(y.values)
 
 
-  def are_domains_different(x: Domain[A], y: Domain[A]): Boolean =
+  def areDomainsDifferent(x: Domain[A], y: Domain[A]): Boolean =
     if (x.isSingleton || y.isSingleton) x.intersect(y).isEmpty
     else true
 
-  def map_domains_combinations(domains_list: List[List[A]]): List[List[A]] =
+  def mapDomainsCombinations(domainsList: List[List[A]]): List[List[A]] =
 
-    domains_list match
+    domainsList match
       case Nil => List(List())
       case x :: tail =>
-        x.flatMap(a => map_domains_combinations(tail).map(e => a :: e)).filter(l => l.toSet.size == l.size)
-  //res = res.filter(l => l.toSet.size == l.size)
-  //res
+        x.flatMap(a => mapDomainsCombinations(tail).map(e => a :: e)).filter(l => l.toSet.size == l.size)
 
-  def set_all_domains_diff(domains_list: List[Domain[A]]): List[Domain[A]] =
-    val all_combinations = map_domains_combinations(domains_list.map(d => d.values.toList))
-    //val combinations_all_different = all_combinations.filter(l => l.toSet.size == l.size)
-    all_combinations.transpose.map(l => Domain(l.toSet))
+  def setAllDomainsDiff(domainsList: List[Domain[A]]): List[Domain[A]] =
+    val allCombinations = mapDomainsCombinations(domainsList.map(d => d.values.toList))
+    allCombinations.transpose.map(l => Domain(l.toSet))

@@ -324,6 +324,7 @@ def launch_chosen_sudoku(difficulty: String): Unit =
   else {
     println("Je n'ai pas compris votre choix.")
     val difficulty: String = ask_difficulty_sudoku()
+    launch_chosen_sudoku(difficulty)
   }
 
 def initialize_sudoku(constraint_grid: List[Constraint[Int]]): CSP[Int] =
