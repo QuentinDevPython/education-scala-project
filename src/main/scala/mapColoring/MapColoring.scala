@@ -3,47 +3,47 @@ package mapColoring
 import scala.io.StdIn.readLine
 import constraintLibrary.*
 
-def map_coloring(): Unit =
-  val difficulty = ask_difficulty_coloring()
-  launch_chosen_map(difficulty)
+def mapColoring(): Unit =
+  val difficulty = askDifficultyColoring()
+  launchChosenMap(difficulty)
 
-def ask_difficulty_coloring(): String =
+def askDifficultyColoring(): String =
   println("Choisissez le niveau de la carte à résoudre :")
   println("- Facile - Australia states (AS)")
   println("- Medium - United states (US)")
   String(readLine())
 
-def launch_chosen_map(difficulty: String): Unit =
+def launchChosenMap(difficulty: String): Unit =
 
 // We launch the correct map coloring difficulty
   if (difficulty == "AS") {
     println("Résolution de la carte Australie ...")
 
-    val mapColoringCsp: CSP[String] = initialize_map_coloring_australia()
-    solve_map_coloring_australia(mapColoringCsp: CSP[String])
+    val mapColoringCsp: CSP[String] = initializeMapColoringAustralia()
+    solveMapColoringAustralia(mapColoringCsp: CSP[String])
   }
   else if (difficulty == "US"){
     println("Résolution de la carte United states")
 
-    val mapColoringCsp: CSP[String] = initialize_map_coloring_united_states()
-    solve_map_coloring_united_states(mapColoringCsp: CSP[String])
+    val mapColoringCsp: CSP[String] = initializeMapColoringUnitedStates()
+    solveMapColoringUnitedStates(mapColoringCsp: CSP[String])
   }
   else {
     println("Je n'ai pas compris votre choix.")
-    val difficulty: String = ask_difficulty_coloring()
+    val difficulty: String = askDifficultyColoring()
   }
 
-def initialize_map_coloring_australia(): CSP[String] =
+def initializeMapColoringAustralia(): CSP[String] =
 
   // Possible colors
-  val colors_domain: Domain[String] = Domain[String](Set("Red", "Green", "Blue"))
+  val colorsDomain: Domain[String] = Domain[String](Set("Red", "Green", "Blue"))
 
   // Here we declare all the Australia states
-  val western_australia = Variable[String]("Western Australia")
-  val northern_territory = Variable[String]("Northern Territory")
-  val south_australia = Variable[String]("South Australia")
+  val westernAustralia = Variable[String]("Western Australia")
+  val northernTerritory = Variable[String]("Northern Territory")
+  val southAustralia = Variable[String]("South Australia")
   val queensland = Variable[String]("Queensland")
-  val new_south_wales = Variable[String]("New South Wales")
+  val newSouthWales = Variable[String]("New South Wales")
   val victoria = Variable[String]("Victoria")
   val tasmania = Variable[String]("Tasmania")
 
@@ -52,44 +52,44 @@ def initialize_map_coloring_australia(): CSP[String] =
       domains =
       // Each variable is bound to the same domain
         Map(
-          western_australia -> colors_domain,
-          northern_territory -> colors_domain,
-          south_australia -> colors_domain,
-          queensland -> colors_domain,
-          new_south_wales -> colors_domain,
-          victoria -> colors_domain,
-          tasmania -> colors_domain,
+          westernAustralia -> colorsDomain,
+          northernTerritory -> colorsDomain,
+          southAustralia -> colorsDomain,
+          queensland -> colorsDomain,
+          newSouthWales -> colorsDomain,
+          victoria -> colorsDomain,
+          tasmania -> colorsDomain,
         ),
       constraints =
         List(
           // Constraints we can fix
-          Constraint.EqualConstant(south_australia, "Blue"),
+          Constraint.EqualConstant(southAustralia, "Blue"),
           Constraint.EqualConstant(queensland, "Red"),
           Constraint.EqualVariables(tasmania, queensland),
 
           // Constraints to solve the map coloring
-          Constraint.DiffVariables(western_australia, northern_territory),
-          Constraint.DiffVariables(western_australia, south_australia),
+          Constraint.DiffVariables(westernAustralia, northernTerritory),
+          Constraint.DiffVariables(westernAustralia, southAustralia),
 
-          Constraint.DiffVariables(northern_territory, south_australia),
-          Constraint.DiffVariables(northern_territory, queensland),
+          Constraint.DiffVariables(northernTerritory, southAustralia),
+          Constraint.DiffVariables(northernTerritory, queensland),
 
-          Constraint.DiffVariables(queensland, south_australia),
-          Constraint.DiffVariables(queensland, new_south_wales),
+          Constraint.DiffVariables(queensland, southAustralia),
+          Constraint.DiffVariables(queensland, newSouthWales),
 
-          Constraint.DiffVariables(new_south_wales, south_australia),
-          Constraint.DiffVariables(new_south_wales, victoria),
+          Constraint.DiffVariables(newSouthWales, southAustralia),
+          Constraint.DiffVariables(newSouthWales, victoria),
 
-          Constraint.DiffVariables(victoria, south_australia),
+          Constraint.DiffVariables(victoria, southAustralia),
         )
     )
   mapColoringCsp
 
 
-def initialize_map_coloring_united_states(): CSP[String] =
+def initializeMapColoringUnitedStates(): CSP[String] =
 
   // Possible colors
-  val colors_domain: Domain[String] = Domain[String](Set("Red", "Green", "Blue", "Yellow"))
+  val colorsDomain: Domain[String] = Domain[String](Set("Red", "Green", "Blue", "Yellow"))
 
   // Here we declare all the United states
   val washington = Variable[String]("Washington")
@@ -102,9 +102,9 @@ def initialize_map_coloring_united_states(): CSP[String] =
   val utah = Variable[String]("Utah")
   val colorado = Variable[String]("Colorado")
   val arizona = Variable[String]("Arizona")
-  val new_mexico = Variable[String]("New Mexico")
-  val north_dakota = Variable[String]("North Dakota")
-  val south_dakota = Variable[String]("South Dakota")
+  val newMexico = Variable[String]("New Mexico")
+  val northDakota = Variable[String]("North Dakota")
+  val southDakota = Variable[String]("South Dakota")
   val nebraska = Variable[String]("Nebraska")
   val kansas = Variable[String]("Kansas")
   val oklahoma = Variable[String]("Oklahoma")
@@ -125,20 +125,20 @@ def initialize_map_coloring_united_states(): CSP[String] =
   val alabama = Variable[String]("Alabama")
   val georgia = Variable[String]("Georgia")
   val florida = Variable[String]("Florida")
-  val south_carolina = Variable[String]("South Carolina")
-  val north_carolina = Variable[String]("North Carolina")
+  val southCarolina = Variable[String]("South Carolina")
+  val northCarolina = Variable[String]("North Carolina")
   val virginia = Variable[String]("Virginia")
-  val wesc_virginia = Variable[String]("Wesc Virginia")
+  val westVirginia = Variable[String]("West Virginia")
   val maryland = Variable[String]("Maryland")
   val delaware = Variable[String]("Delaware")
-  val new_jersey = Variable[String]("New Jersey")
+  val newJersey = Variable[String]("New Jersey")
   val pennsylvania = Variable[String]("Pennsylvania")
   val connecticut = Variable[String]("Connecticut")
-  val rhode_island = Variable[String]("Rhode Island")
+  val rhodeIsland = Variable[String]("Rhode Island")
   val massachusetts = Variable[String]("Massachusetts")
-  val new_york = Variable[String]("New York")
+  val newYork = Variable[String]("New York")
   val vermont = Variable[String]("Vermont")
-  val new_hampshire = Variable[String]("New Hampshire")
+  val newHampshire = Variable[String]("New Hampshire")
   val maine = Variable[String]("Maine")
 
   val mapColoringCsp: CSP[String] =
@@ -146,54 +146,54 @@ def initialize_map_coloring_united_states(): CSP[String] =
       domains =
       // Each variable is bound to the same domain
         Map(
-          washington -> colors_domain,
-          oregon -> colors_domain,
-          california -> colors_domain,
-          nevada -> colors_domain,
-          idaho -> colors_domain,
-          montana -> colors_domain,
-          wyoming -> colors_domain,
-          utah -> colors_domain,
-          colorado -> colors_domain,
-          arizona -> colors_domain,
-          new_mexico -> colors_domain,
-          north_dakota -> colors_domain,
-          south_dakota -> colors_domain,
-          nebraska -> colors_domain,
-          kansas -> colors_domain,
-          oklahoma -> colors_domain,
-          texas -> colors_domain,
-          minnesota -> colors_domain,
-          iowa -> colors_domain,
-          missouri -> colors_domain,
-          arkansas -> colors_domain,
-          louisiana -> colors_domain,
-          wisconsia -> colors_domain,
-          michigan -> colors_domain,
-          illinois -> colors_domain,
-          indiana -> colors_domain,
-          ohio -> colors_domain,
-          kentucky -> colors_domain,
-          tennessee -> colors_domain,
-          mississippi -> colors_domain,
-          alabama -> colors_domain,
-          georgia -> colors_domain,
-          florida -> colors_domain,
-          south_carolina -> colors_domain,
-          north_carolina -> colors_domain,
-          virginia -> colors_domain,
-          wesc_virginia -> colors_domain,
-          maryland -> colors_domain,
-          delaware -> colors_domain,
-          new_jersey -> colors_domain,
-          pennsylvania -> colors_domain,
-          connecticut -> colors_domain,
-          rhode_island -> colors_domain,
-          massachusetts -> colors_domain,
-          new_york -> colors_domain,
-          vermont -> colors_domain,
-          new_hampshire -> colors_domain,
-          maine -> colors_domain,
+          washington -> colorsDomain,
+          oregon -> colorsDomain,
+          california -> colorsDomain,
+          nevada -> colorsDomain,
+          idaho -> colorsDomain,
+          montana -> colorsDomain,
+          wyoming -> colorsDomain,
+          utah -> colorsDomain,
+          colorado -> colorsDomain,
+          arizona -> colorsDomain,
+          newMexico -> colorsDomain,
+          northDakota -> colorsDomain,
+          southDakota -> colorsDomain,
+          nebraska -> colorsDomain,
+          kansas -> colorsDomain,
+          oklahoma -> colorsDomain,
+          texas -> colorsDomain,
+          minnesota -> colorsDomain,
+          iowa -> colorsDomain,
+          missouri -> colorsDomain,
+          arkansas -> colorsDomain,
+          louisiana -> colorsDomain,
+          wisconsia -> colorsDomain,
+          michigan -> colorsDomain,
+          illinois -> colorsDomain,
+          indiana -> colorsDomain,
+          ohio -> colorsDomain,
+          kentucky -> colorsDomain,
+          tennessee -> colorsDomain,
+          mississippi -> colorsDomain,
+          alabama -> colorsDomain,
+          georgia -> colorsDomain,
+          florida -> colorsDomain,
+          southCarolina -> colorsDomain,
+          northCarolina -> colorsDomain,
+          virginia -> colorsDomain,
+          westVirginia -> colorsDomain,
+          maryland -> colorsDomain,
+          delaware -> colorsDomain,
+          newJersey -> colorsDomain,
+          pennsylvania -> colorsDomain,
+          connecticut -> colorsDomain,
+          rhodeIsland -> colorsDomain,
+          massachusetts -> colorsDomain,
+          newYork -> colorsDomain,
+          vermont -> colorsDomain,
+          newHampshire -> colorsDomain,
+          maine -> colorsDomain,
         ),
       constraints =
         List(
@@ -202,22 +202,22 @@ def initialize_map_coloring_united_states(): CSP[String] =
           Constraint.EqualConstant(kansas, "Red"),
           Constraint.EqualVariables(arizona, ohio),
           Constraint.EqualConstant(oregon, "Blue"),
-          Constraint.EqualConstant(south_dakota, "Yellow"),
-          Constraint.EqualConstant(new_york, "Blue"),
+          Constraint.EqualConstant(southDakota, "Yellow"),
+          Constraint.EqualConstant(newYork, "Blue"),
           Constraint.EqualConstant(montana, "Green"),
           Constraint.EqualConstant(arkansas, "Green"),
           Constraint.EqualConstant(georgia, "Yellow"),
           Constraint.EqualConstant(delaware, "Blue"),
           Constraint.EqualConstant(wisconsia, "Green"),
-          Constraint.EqualConstant(north_carolina, "Red"),
-          Constraint.EqualConstant(rhode_island, "Red"),
+          Constraint.EqualConstant(northCarolina, "Red"),
+          Constraint.EqualConstant(rhodeIsland, "Red"),
           Constraint.EqualConstant(utah, "Blue"),
-          Constraint.EqualConstant(new_jersey, "Yellow"),
-          Constraint.EqualConstant(new_hampshire, "Yellow"),
+          Constraint.EqualConstant(newJersey, "Yellow"),
+          Constraint.EqualConstant(newHampshire, "Yellow"),
           Constraint.EqualConstant(alabama, "Green"),
           Constraint.EqualConstant(illinois, "Blue"),
           Constraint.EqualConstant(michigan, "Blue"),
-          Constraint.EqualConstant(wesc_virginia, "Blue"),
+          Constraint.EqualConstant(westVirginia, "Blue"),
           Constraint.EqualConstant(virginia, "Green"),
 
           // Constraints to solve the map coloring
@@ -252,40 +252,40 @@ def initialize_map_coloring_united_states(): CSP[String] =
           Constraint.DiffVariables(utah, arizona),
           Constraint.DiffVariables(utah, wyoming),
           Constraint.DiffVariables(utah, colorado),
-          Constraint.DiffVariables(utah, new_mexico),
+          Constraint.DiffVariables(utah, newMexico),
 
           // Arizona
           Constraint.DiffVariables(arizona, colorado),
-          Constraint.DiffVariables(arizona, new_mexico),
+          Constraint.DiffVariables(arizona, newMexico),
 
           // Montana
           Constraint.DiffVariables(montana, wyoming),
-          Constraint.DiffVariables(montana, north_dakota),
-          Constraint.DiffVariables(montana, south_dakota),
+          Constraint.DiffVariables(montana, northDakota),
+          Constraint.DiffVariables(montana, southDakota),
 
           // Wyoming
           Constraint.DiffVariables(wyoming, colorado),
-          Constraint.DiffVariables(wyoming, south_dakota),
+          Constraint.DiffVariables(wyoming, southDakota),
           Constraint.DiffVariables(wyoming, nebraska),
 
           // Colorado
-          Constraint.DiffVariables(colorado, new_mexico),
+          Constraint.DiffVariables(colorado, newMexico),
           Constraint.DiffVariables(colorado, nebraska),
           Constraint.DiffVariables(colorado, kansas),
           Constraint.DiffVariables(colorado, oklahoma),
 
           // New Mexico
-          Constraint.DiffVariables(new_mexico, oklahoma),
-          Constraint.DiffVariables(new_mexico, texas),
+          Constraint.DiffVariables(newMexico, oklahoma),
+          Constraint.DiffVariables(newMexico, texas),
 
           // North Dakota
-          Constraint.DiffVariables(north_dakota, south_dakota),
-          Constraint.DiffVariables(north_dakota, minnesota),
+          Constraint.DiffVariables(northDakota, southDakota),
+          Constraint.DiffVariables(northDakota, minnesota),
 
           // South Dakota
-          Constraint.DiffVariables(south_dakota, nebraska),
-          Constraint.DiffVariables(south_dakota, minnesota),
-          Constraint.DiffVariables(south_dakota, iowa),
+          Constraint.DiffVariables(southDakota, nebraska),
+          Constraint.DiffVariables(southDakota, minnesota),
+          Constraint.DiffVariables(southDakota, iowa),
 
           // Kansas
           Constraint.DiffVariables(kansas, missouri),
@@ -341,17 +341,17 @@ def initialize_map_coloring_united_states(): CSP[String] =
 
           // Ohio
           Constraint.DiffVariables(ohio, pennsylvania),
-          Constraint.DiffVariables(ohio, wesc_virginia),
+          Constraint.DiffVariables(ohio, westVirginia),
           Constraint.DiffVariables(ohio, kentucky),
 
           // Kentucky
-          Constraint.DiffVariables(kentucky, wesc_virginia),
+          Constraint.DiffVariables(kentucky, westVirginia),
           Constraint.DiffVariables(kentucky, virginia),
           Constraint.DiffVariables(kentucky, tennessee),
 
           // Tennessee
           Constraint.DiffVariables(tennessee, virginia),
-          Constraint.DiffVariables(tennessee, north_carolina),
+          Constraint.DiffVariables(tennessee, northCarolina),
           Constraint.DiffVariables(tennessee, georgia),
           Constraint.DiffVariables(tennessee, alabama),
           Constraint.DiffVariables(tennessee, mississippi),
@@ -367,58 +367,58 @@ def initialize_map_coloring_united_states(): CSP[String] =
           Constraint.DiffVariables(florida, georgia),
 
           // Georgia
-          Constraint.DiffVariables(georgia, south_carolina),
+          Constraint.DiffVariables(georgia, southCarolina),
 
           // South Carolina
-          Constraint.DiffVariables(south_carolina, north_carolina),
+          Constraint.DiffVariables(southCarolina, northCarolina),
 
           // North Carolina
-          Constraint.DiffVariables(north_carolina, virginia),
+          Constraint.DiffVariables(northCarolina, virginia),
 
           // Virginia
-          Constraint.DiffVariables(virginia, wesc_virginia),
+          Constraint.DiffVariables(virginia, westVirginia),
           Constraint.DiffVariables(virginia, maryland),
 
-          // Wesc Virginia
-          Constraint.DiffVariables(wesc_virginia, maryland),
-          Constraint.DiffVariables(wesc_virginia, pennsylvania),
+          // West Virginia
+          Constraint.DiffVariables(westVirginia, maryland),
+          Constraint.DiffVariables(westVirginia, pennsylvania),
 
           // Maryland
           Constraint.DiffVariables(maryland, pennsylvania),
           Constraint.DiffVariables(maryland, delaware),
 
           // Delaware
-          Constraint.DiffVariables(delaware, new_jersey),
+          Constraint.DiffVariables(delaware, newJersey),
           Constraint.DiffVariables(delaware, pennsylvania),
 
           // Pennsylvania
-          Constraint.DiffVariables(pennsylvania, new_jersey),
-          Constraint.DiffVariables(pennsylvania, new_york),
+          Constraint.DiffVariables(pennsylvania, newJersey),
+          Constraint.DiffVariables(pennsylvania, newYork),
 
           // New Jersey
-          Constraint.DiffVariables(new_jersey, new_york),
+          Constraint.DiffVariables(newJersey, newYork),
 
           // New York
-          Constraint.DiffVariables(new_york, connecticut),
-          Constraint.DiffVariables(new_york, massachusetts),
-          Constraint.DiffVariables(new_york, vermont),
+          Constraint.DiffVariables(newYork, connecticut),
+          Constraint.DiffVariables(newYork, massachusetts),
+          Constraint.DiffVariables(newYork, vermont),
 
           // Connecticut
-          Constraint.DiffVariables(connecticut, rhode_island),
+          Constraint.DiffVariables(connecticut, rhodeIsland),
           Constraint.DiffVariables(connecticut, massachusetts),
 
           // Rhode Island
-          Constraint.DiffVariables(rhode_island, massachusetts),
+          Constraint.DiffVariables(rhodeIsland, massachusetts),
 
           // Massachussets
           Constraint.DiffVariables(massachusetts, vermont),
-          Constraint.DiffVariables(massachusetts, new_hampshire),
+          Constraint.DiffVariables(massachusetts, newHampshire),
 
           // Vermont
-          Constraint.DiffVariables(vermont, new_hampshire),
+          Constraint.DiffVariables(vermont, newHampshire),
 
           // New Hampshire
-          Constraint.DiffVariables(new_hampshire, maine),
+          Constraint.DiffVariables(newHampshire, maine),
           
           // Maine
         )
@@ -427,176 +427,176 @@ def initialize_map_coloring_united_states(): CSP[String] =
 
 
 
-def solve_map_coloring_australia(mapColoringCsp: CSP[String]): Unit =
-  val solved_map: Map[Variable[String], Domain[String]] = mapColoringCsp.solve
+def solveMapColoringAustralia(mapColoringCsp: CSP[String]): Unit =
+  val solvedMap: Map[Variable[String], Domain[String]] = mapColoringCsp.solve
 
   println()
   print("Western Australia => ")
-  println(solved_map(Variable("Western Australia")).values.head)
+  println(solvedMap(Variable("Western Australia")).values.head)
 
   print("Northern Territory => ")
-  println(solved_map(Variable("Northern Territory")).values.head)
+  println(solvedMap(Variable("Northern Territory")).values.head)
 
   print("South Australia => ")
-  println(solved_map(Variable("South Australia")).values.head)
+  println(solvedMap(Variable("South Australia")).values.head)
 
   print("Queensland => ")
-  println(solved_map(Variable("Queensland")).values.head)
+  println(solvedMap(Variable("Queensland")).values.head)
 
   print("New South Wales => ")
-  println(solved_map(Variable("New South Wales")).values.head)
+  println(solvedMap(Variable("New South Wales")).values.head)
 
   print("Victoria => ")
-  println(solved_map(Variable("Victoria")).values.head)
+  println(solvedMap(Variable("Victoria")).values.head)
 
   print("Tasmania => ")
-  println(solved_map(Variable("Tasmania")).values.head)
+  println(solvedMap(Variable("Tasmania")).values.head)
 
-def solve_map_coloring_united_states(mapColoringCsp: CSP[String]): Unit =
-  val solved_map: Map[Variable[String], Domain[String]] = mapColoringCsp.solve
+def solveMapColoringUnitedStates(mapColoringCsp: CSP[String]): Unit =
+  val solvedMap: Map[Variable[String], Domain[String]] = mapColoringCsp.solve
   
   println()
   print("Washington => ")
-  println(solved_map(Variable("Washington")).values.head)
+  println(solvedMap(Variable("Washington")).values.head)
 
   print("Oregon => ")
-  println(solved_map(Variable("Oregon")).values.head)
+  println(solvedMap(Variable("Oregon")).values.head)
 
   print("California => ")
-  println(solved_map(Variable("California")).values.head)
+  println(solvedMap(Variable("California")).values.head)
 
   print("Nevada => ")
-  println(solved_map(Variable("Nevada")).values.head)
+  println(solvedMap(Variable("Nevada")).values.head)
 
   print("Idaho => ")
-  println(solved_map(Variable("Idaho")).values.head)
+  println(solvedMap(Variable("Idaho")).values.head)
   
   print("Montana => ")
-  println(solved_map(Variable("Montana")).values.head)
+  println(solvedMap(Variable("Montana")).values.head)
   
   print("Wyoming => ")
-  println(solved_map(Variable("Wyoming")).values.head)
+  println(solvedMap(Variable("Wyoming")).values.head)
 
   print("Utah => ")
-  println(solved_map(Variable("Utah")).values.head)
+  println(solvedMap(Variable("Utah")).values.head)
 
   print("Colorado => ")
-  println(solved_map(Variable("Colorado")).values.head)
+  println(solvedMap(Variable("Colorado")).values.head)
 
   print("Arizona => ")
-  println(solved_map(Variable("Arizona")).values.head)
+  println(solvedMap(Variable("Arizona")).values.head)
 
   print("New Mexico => ")
-  println(solved_map(Variable("New Mexico")).values.head)
+  println(solvedMap(Variable("New Mexico")).values.head)
 
   print("North Dakota => ")
-  println(solved_map(Variable("North Dakota")).values.head)
+  println(solvedMap(Variable("North Dakota")).values.head)
 
   print("South Dakota => ")
-  println(solved_map(Variable("South Dakota")).values.head)
+  println(solvedMap(Variable("South Dakota")).values.head)
 
   print("Nebraska => ")
-  println(solved_map(Variable("Nebraska")).values.head)
+  println(solvedMap(Variable("Nebraska")).values.head)
 
   print("Kansas => ")
-  println(solved_map(Variable("Kansas")).values.head)
+  println(solvedMap(Variable("Kansas")).values.head)
 
   print("Oklahoma => ")
-  println(solved_map(Variable("Oklahoma")).values.head)
+  println(solvedMap(Variable("Oklahoma")).values.head)
 
   print("Texas => ")
-  println(solved_map(Variable("Texas")).values.head)
+  println(solvedMap(Variable("Texas")).values.head)
 
   print("Minnesota => ")
-  println(solved_map(Variable("Minnesota")).values.head)
+  println(solvedMap(Variable("Minnesota")).values.head)
 
   print("Iowa => ")
-  println(solved_map(Variable("Iowa")).values.head)
+  println(solvedMap(Variable("Iowa")).values.head)
 
   print("Missouri => ")
-  println(solved_map(Variable("Missouri")).values.head)
+  println(solvedMap(Variable("Missouri")).values.head)
 
   print("Arkansas => ")
-  println(solved_map(Variable("Arkansas")).values.head)
+  println(solvedMap(Variable("Arkansas")).values.head)
 
   print("Louisiana => ")
-  println(solved_map(Variable("Louisiana")).values.head)
+  println(solvedMap(Variable("Louisiana")).values.head)
 
   print("Wisconsia => ")
-  println(solved_map(Variable("Wisconsia")).values.head)
+  println(solvedMap(Variable("Wisconsia")).values.head)
 
   print("Michigan => ")
-  println(solved_map(Variable("Michigan")).values.head)
+  println(solvedMap(Variable("Michigan")).values.head)
 
   print("Illinois => ")
-  println(solved_map(Variable("Illinois")).values.head)
+  println(solvedMap(Variable("Illinois")).values.head)
 
   print("Indiana => ")
-  println(solved_map(Variable("Indiana")).values.head)
+  println(solvedMap(Variable("Indiana")).values.head)
 
   print("Ohio => ")
-  println(solved_map(Variable("Ohio")).values.head)
+  println(solvedMap(Variable("Ohio")).values.head)
 
   print("Kentucky => ")
-  println(solved_map(Variable("Kentucky")).values.head)
+  println(solvedMap(Variable("Kentucky")).values.head)
   
   print("Tennessee => ")
-  println(solved_map(Variable("Tennessee")).values.head)
+  println(solvedMap(Variable("Tennessee")).values.head)
 
   print("Mississippi => ")
-  println(solved_map(Variable("Mississippi")).values.head)
+  println(solvedMap(Variable("Mississippi")).values.head)
 
   print("Alabama => ")
-  println(solved_map(Variable("Alabama")).values.head)
+  println(solvedMap(Variable("Alabama")).values.head)
 
   print("Georgia => ")
-  println(solved_map(Variable("Georgia")).values.head)
+  println(solvedMap(Variable("Georgia")).values.head)
   
   print("Florida => ")
-  println(solved_map(Variable("Florida")).values.head)
+  println(solvedMap(Variable("Florida")).values.head)
 
   print("South Carolina => ")
-  println(solved_map(Variable("South Carolina")).values.head)
+  println(solvedMap(Variable("South Carolina")).values.head)
 
   print("North Carolina => ")
-  println(solved_map(Variable("North Carolina")).values.head)
+  println(solvedMap(Variable("North Carolina")).values.head)
 
   print("Virginia => ")
-  println(solved_map(Variable("Virginia")).values.head)
+  println(solvedMap(Variable("Virginia")).values.head)
 
-  print("Wesc Virginia => ")
-  println(solved_map(Variable("Wesc Virginia")).values.head)
+  print("West Virginia => ")
+  println(solvedMap(Variable("West Virginia")).values.head)
   
   print("Maryland => ")
-  println(solved_map(Variable("Maryland")).values.head)
+  println(solvedMap(Variable("Maryland")).values.head)
 
   print("Delaware => ")
-  println(solved_map(Variable("Delaware")).values.head)
+  println(solvedMap(Variable("Delaware")).values.head)
 
   print("New Jersey => ")
-  println(solved_map(Variable("New Jersey")).values.head)
+  println(solvedMap(Variable("New Jersey")).values.head)
 
   print("Pennsylvania => ")
-  println(solved_map(Variable("Pennsylvania")).values.head)
+  println(solvedMap(Variable("Pennsylvania")).values.head)
 
   print("Connecticut => ")
-  println(solved_map(Variable("Connecticut")).values.head)
+  println(solvedMap(Variable("Connecticut")).values.head)
 
   print("Rhode Island => ")
-  println(solved_map(Variable("Rhode Island")).values.head)
+  println(solvedMap(Variable("Rhode Island")).values.head)
 
   print("Massachusetts => ")
-  println(solved_map(Variable("Massachusetts")).values.head)
+  println(solvedMap(Variable("Massachusetts")).values.head)
 
   print("New York => ")
-  println(solved_map(Variable("New York")).values.head)
+  println(solvedMap(Variable("New York")).values.head)
 
   print("Vermont => ")
-  println(solved_map(Variable("Vermont")).values.head)
+  println(solvedMap(Variable("Vermont")).values.head)
 
   print("New Hampshire => ")
-  println(solved_map(Variable("New Hampshire")).values.head)
+  println(solvedMap(Variable("New Hampshire")).values.head)
 
   print("Maine => ")
-  println(solved_map(Variable("Maine")).values.head)
+  println(solvedMap(Variable("Maine")).values.head)
   
