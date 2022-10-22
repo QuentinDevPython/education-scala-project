@@ -16,6 +16,7 @@ case class Domain[A](values: Set[A]):
   def isEmpty: Boolean = values.isEmpty
 
   def isSingleton: Boolean = values.size == 1
+  def toSingleton: Domain[A] = Domain(Set(values.head))
 
   def length: Int = values.size
 
@@ -34,9 +35,17 @@ case class CSP[A](domains: Map[Variable[A], Domain[A]], constraints: List[Constr
     val constraint: Option[Constraint[A]] = constraints.find(c => !is_satisfied(c)) // Cherche la première contrainte non satisfaite
 
     constraint match
-      case None => domains // Si elles le sont toutes on a trouvé notre Map
+      case None => // Si toutes les contraintes sont satisfaites
+        val varToReduce = domains.find(!_._2.isSingleton)
+        varToReduce match
+          case Some(v) =>
+            if v._2.isEmpty then Map() // Si le domaine est vide on ne peut pas résoudre les contraintes
+            // Si il reste des domaines à réduire on fixe une valeur et on résout
+            val newCSP: CSP[A] = update_domains(Map(v._1 -> v._2.toSingleton))
+            newCSP.solve
+          case None => domains
       case Some(x) => // Si une contrainte non satisfaite a été trouvée
-        // On créer un nouveau CSP qu'on résout (récursivement)
+        // On crée un nouveau CSP qu'on résout (récursivement)
         val newCSP: CSP[A] = update_domains(apply_constraint(x))
         newCSP.solve
 
