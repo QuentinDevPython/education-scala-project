@@ -124,10 +124,10 @@ val v98 = Variable[Int]("v98")
 val v99 = Variable[Int]("v99")
 
 def sudoku(): Unit =
-  val difficulty = ask_difficulty_sudoku()
-  launch_chosen_sudoku(difficulty)
+  val difficulty = askDifficultySudoku()
+  launchChosenSudoku(difficulty)
 
-def ask_difficulty_sudoku(): String =
+def askDifficultySudoku(): String =
   println("Choisissez le niveau du sudoku à résoudre :")
   println("- Facile (F)")
   println("- Medium (M)")
@@ -135,13 +135,13 @@ def ask_difficulty_sudoku(): String =
   String(readLine())
 
 // Sudoku grids on : https://sudoku.com/fr/moyen/
-def launch_chosen_sudoku(difficulty: String): Unit =
+def launchChosenSudoku(difficulty: String): Unit =
 
   // Now we lauch the correct sudoku difficulty
   if (difficulty == "F") {
     println("Résolution du niveau facile ...")
 
-    val constraint_grid_easy: List[Constraint[Int]] =
+    val constraintGridEasy: List[Constraint[Int]] =
       List(
         // All the 1 values
         Constraint.EqualConstant(v28, 1),
@@ -196,13 +196,13 @@ def launch_chosen_sudoku(difficulty: String): Unit =
         Constraint.EqualVariables(v17, v58)
       )
 
-    val sudokuCsp: CSP[Int] = initialize_sudoku(constraint_grid_easy)
-    solve_sudoku(sudokuCsp: CSP[Int])
+    val sudokuCsp: CSP[Int] = initializeSudoku(constraintGridEasy)
+    solveSudoku(sudokuCsp: CSP[Int])
   }
   else if (difficulty == "M") {
     println("Résolution du niveau médium ...")
 
-    val constraint_grid_medium: List[Constraint[Int]] =
+    val constraintGridMedium: List[Constraint[Int]] =
       List(
         // All the 1 values
         Constraint.EqualConstant(v13, 1),
@@ -254,14 +254,14 @@ def launch_chosen_sudoku(difficulty: String): Unit =
 
       )
 
-    val sudokuCsp: CSP[Int] = initialize_sudoku(constraint_grid_medium)
-    solve_sudoku(sudokuCsp: CSP[Int])
+    val sudokuCsp: CSP[Int] = initializeSudoku(constraintGridMedium)
+    solveSudoku(sudokuCsp: CSP[Int])
 
   }
   else if (difficulty == "I") {
     println("Ca me paraît impossible. Tentative en cours ...")
 
-    val constraint_grid_impossible: List[Constraint[Int]] =
+    val constraintGridImpossible: List[Constraint[Int]] =
       List(
         // All the 1 values
         Constraint.EqualConstant(v28, 1),
@@ -317,24 +317,24 @@ def launch_chosen_sudoku(difficulty: String): Unit =
         Constraint.EqualVariables(v17, v58)
       )
 
-    val sudokuCsp: CSP[Int] = initialize_sudoku(constraint_grid_impossible)
-    solve_sudoku(sudokuCsp: CSP[Int])
+    val sudokuCsp: CSP[Int] = initializeSudoku(constraintGridImpossible)
+    solveSudoku(sudokuCsp: CSP[Int])
 
   }
   else {
     println("Je n'ai pas compris votre choix.")
-    val difficulty: String = ask_difficulty_sudoku()
-    launch_chosen_sudoku(difficulty)
+    val difficulty: String = askDifficultySudoku()
+    launchChosenSudoku(difficulty)
   }
 
-def initialize_sudoku(constraint_grid: List[Constraint[Int]]): CSP[Int] =
+def initializeSudoku(constraintGrid: List[Constraint[Int]]): CSP[Int] =
 
   // Sudoku implementation
 
   // Possible values than can take a sudoku box
-  val possibilities_domain: Domain[Int] = Domain[Int](Set(1, 2, 3, 4, 5, 6, 7, 8, 9))
+  val possibilitiesDomain: Domain[Int] = Domain[Int](Set(1, 2, 3, 4, 5, 6, 7, 8, 9))
 
-  val constraint_list_solve_sudoku: List[Constraint[Int]] =
+  val constraintListSolveSudoku: List[Constraint[Int]] =
     List(
       // AllDiff on sudoku lines
       Constraint.AllDiff(List[Variable[Int]](v11, v12, v13, v14, v15, v16, v17, v18, v19)),
@@ -372,7 +372,7 @@ def initialize_sudoku(constraint_grid: List[Constraint[Int]]): CSP[Int] =
       Constraint.AllDiff(List[Variable[Int]](v77, v78, v79, v87, v88, v89, v97, v98, v99))
     )
 
-  val constraint_list: List[Constraint[Int]] = constraint_grid ::: constraint_list_solve_sudoku
+  val constraintList: List[Constraint[Int]] = constraintGrid ::: constraintListSolveSudoku
 
 
   val sudokuCsp: CSP[Int] =
@@ -380,297 +380,296 @@ def initialize_sudoku(constraint_grid: List[Constraint[Int]]): CSP[Int] =
       domains =
       // Each variable is bound to the same domain
         Map(
-          v11 -> possibilities_domain,
-          v12 -> possibilities_domain,
-          v13 -> possibilities_domain,
-          v14 -> possibilities_domain,
-          v15 -> possibilities_domain,
-          v16 -> possibilities_domain,
-          v17 -> possibilities_domain,
-          v18 -> possibilities_domain,
-          v19 -> possibilities_domain,
+          v11 -> possibilitiesDomain,
+          v12 -> possibilitiesDomain,
+          v13 -> possibilitiesDomain,
+          v14 -> possibilitiesDomain,
+          v15 -> possibilitiesDomain,
+          v16 -> possibilitiesDomain,
+          v17 -> possibilitiesDomain,
+          v18 -> possibilitiesDomain,
+          v19 -> possibilitiesDomain,
 
-          v21 -> possibilities_domain,
-          v22 -> possibilities_domain,
-          v23 -> possibilities_domain,
-          v24 -> possibilities_domain,
-          v25 -> possibilities_domain,
-          v26 -> possibilities_domain,
-          v27 -> possibilities_domain,
-          v28 -> possibilities_domain,
-          v29 -> possibilities_domain,
+          v21 -> possibilitiesDomain,
+          v22 -> possibilitiesDomain,
+          v23 -> possibilitiesDomain,
+          v24 -> possibilitiesDomain,
+          v25 -> possibilitiesDomain,
+          v26 -> possibilitiesDomain,
+          v27 -> possibilitiesDomain,
+          v28 -> possibilitiesDomain,
+          v29 -> possibilitiesDomain,
 
-          v31 -> possibilities_domain,
-          v32 -> possibilities_domain,
-          v33 -> possibilities_domain,
-          v34 -> possibilities_domain,
-          v35 -> possibilities_domain,
-          v36 -> possibilities_domain,
-          v37 -> possibilities_domain,
-          v38 -> possibilities_domain,
-          v39 -> possibilities_domain,
+          v31 -> possibilitiesDomain,
+          v32 -> possibilitiesDomain,
+          v33 -> possibilitiesDomain,
+          v34 -> possibilitiesDomain,
+          v35 -> possibilitiesDomain,
+          v36 -> possibilitiesDomain,
+          v37 -> possibilitiesDomain,
+          v38 -> possibilitiesDomain,
+          v39 -> possibilitiesDomain,
 
-          v41 -> possibilities_domain,
-          v42 -> possibilities_domain,
-          v43 -> possibilities_domain,
-          v44 -> possibilities_domain,
-          v45 -> possibilities_domain,
-          v46 -> possibilities_domain,
-          v47 -> possibilities_domain,
-          v48 -> possibilities_domain,
-          v49 -> possibilities_domain,
+          v41 -> possibilitiesDomain,
+          v42 -> possibilitiesDomain,
+          v43 -> possibilitiesDomain,
+          v44 -> possibilitiesDomain,
+          v45 -> possibilitiesDomain,
+          v46 -> possibilitiesDomain,
+          v47 -> possibilitiesDomain,
+          v48 -> possibilitiesDomain,
+          v49 -> possibilitiesDomain,
 
-          v51 -> possibilities_domain,
-          v52 -> possibilities_domain,
-          v53 -> possibilities_domain,
-          v54 -> possibilities_domain,
-          v55 -> possibilities_domain,
-          v56 -> possibilities_domain,
-          v57 -> possibilities_domain,
-          v58 -> possibilities_domain,
-          v59 -> possibilities_domain,
+          v51 -> possibilitiesDomain,
+          v52 -> possibilitiesDomain,
+          v53 -> possibilitiesDomain,
+          v54 -> possibilitiesDomain,
+          v55 -> possibilitiesDomain,
+          v56 -> possibilitiesDomain,
+          v57 -> possibilitiesDomain,
+          v58 -> possibilitiesDomain,
+          v59 -> possibilitiesDomain,
 
-          v61 -> possibilities_domain,
-          v62 -> possibilities_domain,
-          v63 -> possibilities_domain,
-          v64 -> possibilities_domain,
-          v65 -> possibilities_domain,
-          v66 -> possibilities_domain,
-          v67 -> possibilities_domain,
-          v68 -> possibilities_domain,
-          v69 -> possibilities_domain,
+          v61 -> possibilitiesDomain,
+          v62 -> possibilitiesDomain,
+          v63 -> possibilitiesDomain,
+          v64 -> possibilitiesDomain,
+          v65 -> possibilitiesDomain,
+          v66 -> possibilitiesDomain,
+          v67 -> possibilitiesDomain,
+          v68 -> possibilitiesDomain,
+          v69 -> possibilitiesDomain,
 
-          v71 -> possibilities_domain,
-          v72 -> possibilities_domain,
-          v73 -> possibilities_domain,
-          v74 -> possibilities_domain,
-          v75 -> possibilities_domain,
-          v76 -> possibilities_domain,
-          v77 -> possibilities_domain,
-          v78 -> possibilities_domain,
-          v79 -> possibilities_domain,
+          v71 -> possibilitiesDomain,
+          v72 -> possibilitiesDomain,
+          v73 -> possibilitiesDomain,
+          v74 -> possibilitiesDomain,
+          v75 -> possibilitiesDomain,
+          v76 -> possibilitiesDomain,
+          v77 -> possibilitiesDomain,
+          v78 -> possibilitiesDomain,
+          v79 -> possibilitiesDomain,
 
-          v81 -> possibilities_domain,
-          v82 -> possibilities_domain,
-          v83 -> possibilities_domain,
-          v84 -> possibilities_domain,
-          v85 -> possibilities_domain,
-          v86 -> possibilities_domain,
-          v87 -> possibilities_domain,
-          v88 -> possibilities_domain,
-          v89 -> possibilities_domain,
+          v81 -> possibilitiesDomain,
+          v82 -> possibilitiesDomain,
+          v83 -> possibilitiesDomain,
+          v84 -> possibilitiesDomain,
+          v85 -> possibilitiesDomain,
+          v86 -> possibilitiesDomain,
+          v87 -> possibilitiesDomain,
+          v88 -> possibilitiesDomain,
+          v89 -> possibilitiesDomain,
 
-          v91 -> possibilities_domain,
-          v92 -> possibilities_domain,
-          v93 -> possibilities_domain,
-          v94 -> possibilities_domain,
-          v95 -> possibilities_domain,
-          v96 -> possibilities_domain,
-          v97 -> possibilities_domain,
-          v98 -> possibilities_domain,
-          v99 -> possibilities_domain,
+          v91 -> possibilitiesDomain,
+          v92 -> possibilitiesDomain,
+          v93 -> possibilitiesDomain,
+          v94 -> possibilitiesDomain,
+          v95 -> possibilitiesDomain,
+          v96 -> possibilitiesDomain,
+          v97 -> possibilitiesDomain,
+          v98 -> possibilitiesDomain,
+          v99 -> possibilitiesDomain,
         ),
-      constraints = constraint_list
+      constraints = constraintList
     )
   sudokuCsp
 
-def solve_sudoku(sudokuCsp: CSP[Int]): Unit =
-  val solved_sudoku: Map[Variable[Int], Domain[Int]] = sudokuCsp.solve
-  if solved_sudoku.isEmpty then println("Soduku impossible à résoudre ...\n")
-  else
-    println("-----------------------------------------")
+def solveSudoku(sudokuCsp: CSP[Int]): Unit =
+  val solvedSudoku: Map[Variable[Int], Domain[Int]] = sudokuCsp.solve
 
-    // 1st line
-    print("|| ")
-    print(solved_sudoku(Variable("v11")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v12")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v13")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v14")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v15")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v16")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v17")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v18")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v19")).values.head)
-    println(" || ")
+  println("-----------------------------------------")
 
-    // 2nd line
-    print("|| ")
-    print(solved_sudoku(Variable("v21")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v22")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v23")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v24")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v25")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v26")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v27")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v28")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v29")).values.head)
-    println(" || ")
+  // 1st line
+  print("|| ")
+  print(solvedSudoku(Variable("v11")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v12")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v13")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v14")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v15")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v16")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v17")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v18")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v19")).values.head)
+  println(" || ")
 
-    // 3rd line
-    print("|| ")
-    print(solved_sudoku(Variable("v31")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v32")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v33")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v34")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v35")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v36")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v37")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v38")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v39")).values.head)
-    println(" || ")
+  // 2nd line
+  print("|| ")
+  print(solvedSudoku(Variable("v21")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v22")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v23")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v24")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v25")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v26")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v27")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v28")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v29")).values.head)
+  println(" || ")
 
-    println()
+  // 3rd line
+  print("|| ")
+  print(solvedSudoku(Variable("v31")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v32")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v33")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v34")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v35")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v36")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v37")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v38")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v39")).values.head)
+  println(" || ")
 
-    // 4th line
-    print("|| ")
-    print(solved_sudoku(Variable("v41")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v42")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v43")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v44")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v45")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v46")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v47")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v48")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v49")).values.head)
-    println(" || ")
+  println()
 
-    // 5th line
-    print("|| ")
-    print(solved_sudoku(Variable("v51")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v52")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v53")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v54")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v55")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v56")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v57")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v58")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v59")).values.head)
-    println(" || ")
+  // 4th line
+  print("|| ")
+  print(solvedSudoku(Variable("v41")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v42")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v43")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v44")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v45")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v46")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v47")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v48")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v49")).values.head)
+  println(" || ")
 
-    // 6th line
-    print("|| ")
-    print(solved_sudoku(Variable("v61")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v62")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v63")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v64")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v65")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v66")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v67")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v68")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v69")).values.head)
-    println(" || ")
+  // 5th line
+  print("|| ")
+  print(solvedSudoku(Variable("v51")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v52")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v53")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v54")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v55")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v56")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v57")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v58")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v59")).values.head)
+  println(" || ")
 
-    println()
+  // 6th line
+  print("|| ")
+  print(solvedSudoku(Variable("v61")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v62")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v63")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v64")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v65")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v66")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v67")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v68")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v69")).values.head)
+  println(" || ")
 
-    // 7th line
-    print("|| ")
-    print(solved_sudoku(Variable("v71")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v72")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v73")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v74")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v75")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v76")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v77")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v78")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v79")).values.head)
-    println(" || ")
+  println()
 
-    // 8th line
-    print("|| ")
-    print(solved_sudoku(Variable("v81")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v82")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v83")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v84")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v85")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v86")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v87")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v88")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v89")).values.head)
-    println(" || ")
+  // 7th line
+  print("|| ")
+  print(solvedSudoku(Variable("v71")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v72")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v73")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v74")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v75")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v76")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v77")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v78")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v79")).values.head)
+  println(" || ")
 
-    // 9th line
-    print("|| ")
-    print(solved_sudoku(Variable("v91")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v92")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v93")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v94")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v95")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v96")).values.head)
-    print(" || ")
-    print(solved_sudoku(Variable("v97")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v98")).values.head)
-    print(" | ")
-    print(solved_sudoku(Variable("v99")).values.head)
-    println(" || ")
+  // 8th line
+  print("|| ")
+  print(solvedSudoku(Variable("v81")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v82")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v83")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v84")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v85")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v86")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v87")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v88")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v89")).values.head)
+  println(" || ")
 
-    println("-----------------------------------------")
+  // 9th line
+  print("|| ")
+  print(solvedSudoku(Variable("v91")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v92")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v93")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v94")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v95")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v96")).values.head)
+  print(" || ")
+  print(solvedSudoku(Variable("v97")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v98")).values.head)
+  print(" | ")
+  print(solvedSudoku(Variable("v99")).values.head)
+  println(" || ")
+
+  println("-----------------------------------------")
