@@ -3,15 +3,18 @@ package mapColoring
 import scala.io.StdIn.readLine
 import constraintLibrary.*
 
+
 def mapColoring(): Unit =
   val difficulty = askDifficultyColoring()
   launchChosenMap(difficulty)
+
 
 def askDifficultyColoring(): String =
   println("Choisissez le niveau de la carte à résoudre :")
   println("- Facile - Australia states (AS)")
   println("- Medium - United states (US)")
   String(readLine())
+
 
 def launchChosenMap(difficulty: String): Unit =
 
@@ -33,6 +36,7 @@ def launchChosenMap(difficulty: String): Unit =
     val difficulty: String = askDifficultyColoring()
     launchChosenMap(difficulty)
   }
+
 
 def initializeMapColoringAustralia(): CSP[String] =
 
@@ -428,177 +432,41 @@ def initializeMapColoringUnitedStates(): CSP[String] =
   mapColoringCsp
 
 
-
 def solveMapColoringAustralia(mapColoringCsp: CSP[String]): Unit =
   val solvedMap: Map[Variable[String], Domain[String]] = mapColoringCsp.solve
 
-  println()
-  print("Western Australia => ")
-  println(solvedMap(Variable("Western Australia")).values.head)
+  val list_australia_states: List[String] = List[String](
+    "Western Australia", "Northern Territory", "South Australia",
+    "Queensland", "New South Wales", "Victoria", "Tasmania"
+  )
 
-  print("Northern Territory => ")
-  println(solvedMap(Variable("Northern Territory")).values.head)
+  printSolvedMapColoring(list_australia_states, solvedMap)
 
-  print("South Australia => ")
-  println(solvedMap(Variable("South Australia")).values.head)
-
-  print("Queensland => ")
-  println(solvedMap(Variable("Queensland")).values.head)
-
-  print("New South Wales => ")
-  println(solvedMap(Variable("New South Wales")).values.head)
-
-  print("Victoria => ")
-  println(solvedMap(Variable("Victoria")).values.head)
-
-  print("Tasmania => ")
-  println(solvedMap(Variable("Tasmania")).values.head)
 
 def solveMapColoringUnitedStates(mapColoringCsp: CSP[String]): Unit =
   val solvedMap: Map[Variable[String], Domain[String]] = mapColoringCsp.solve
   
+  val list_united_states: List[String] = List[String](
+    "Washington", "Oregon", "California", "Nevada", "Idaho",
+    "Montana", "Wyoming", "Utah", "Colorado", "Arizona",
+    "New Mexico", "North Dakota", "South Dakota", "Nebraska",
+    "Kansas", "Oklahoma", "Texas", "Minnesota", "Iowa",
+    "Missouri", "Arkansas", "Louisiana", "Wisconsia",
+    "Michigan", "Illinois", "Indiana", "Ohio", "Kentucky",
+    "Tennessee", "Mississippi", "Alabama", "Georgia",
+    "Florida", "South Carolina", "North Carolina",
+    "Virginia", "Wesc Virginia", "Maryland", "Delaware",
+    "New Jersey", "Pennsylvania", "Connecticut",
+    "Rhode Island", "Massachusetts", "New York", "Vermont",
+    "New Hampshire", "Maine"
+  )
+  
+  printSolvedMapColoring(list_united_states, solvedMap)
+
+
+def printSolvedMapColoring(list_states: List[String], solvedMap:  Map[Variable[String], Domain[String]]): Unit=
   println()
-  print("Washington => ")
-  println(solvedMap(Variable("Washington")).values.head)
-
-  print("Oregon => ")
-  println(solvedMap(Variable("Oregon")).values.head)
-
-  print("California => ")
-  println(solvedMap(Variable("California")).values.head)
-
-  print("Nevada => ")
-  println(solvedMap(Variable("Nevada")).values.head)
-
-  print("Idaho => ")
-  println(solvedMap(Variable("Idaho")).values.head)
-  
-  print("Montana => ")
-  println(solvedMap(Variable("Montana")).values.head)
-  
-  print("Wyoming => ")
-  println(solvedMap(Variable("Wyoming")).values.head)
-
-  print("Utah => ")
-  println(solvedMap(Variable("Utah")).values.head)
-
-  print("Colorado => ")
-  println(solvedMap(Variable("Colorado")).values.head)
-
-  print("Arizona => ")
-  println(solvedMap(Variable("Arizona")).values.head)
-
-  print("New Mexico => ")
-  println(solvedMap(Variable("New Mexico")).values.head)
-
-  print("North Dakota => ")
-  println(solvedMap(Variable("North Dakota")).values.head)
-
-  print("South Dakota => ")
-  println(solvedMap(Variable("South Dakota")).values.head)
-
-  print("Nebraska => ")
-  println(solvedMap(Variable("Nebraska")).values.head)
-
-  print("Kansas => ")
-  println(solvedMap(Variable("Kansas")).values.head)
-
-  print("Oklahoma => ")
-  println(solvedMap(Variable("Oklahoma")).values.head)
-
-  print("Texas => ")
-  println(solvedMap(Variable("Texas")).values.head)
-
-  print("Minnesota => ")
-  println(solvedMap(Variable("Minnesota")).values.head)
-
-  print("Iowa => ")
-  println(solvedMap(Variable("Iowa")).values.head)
-
-  print("Missouri => ")
-  println(solvedMap(Variable("Missouri")).values.head)
-
-  print("Arkansas => ")
-  println(solvedMap(Variable("Arkansas")).values.head)
-
-  print("Louisiana => ")
-  println(solvedMap(Variable("Louisiana")).values.head)
-
-  print("Wisconsia => ")
-  println(solvedMap(Variable("Wisconsia")).values.head)
-
-  print("Michigan => ")
-  println(solvedMap(Variable("Michigan")).values.head)
-
-  print("Illinois => ")
-  println(solvedMap(Variable("Illinois")).values.head)
-
-  print("Indiana => ")
-  println(solvedMap(Variable("Indiana")).values.head)
-
-  print("Ohio => ")
-  println(solvedMap(Variable("Ohio")).values.head)
-
-  print("Kentucky => ")
-  println(solvedMap(Variable("Kentucky")).values.head)
-  
-  print("Tennessee => ")
-  println(solvedMap(Variable("Tennessee")).values.head)
-
-  print("Mississippi => ")
-  println(solvedMap(Variable("Mississippi")).values.head)
-
-  print("Alabama => ")
-  println(solvedMap(Variable("Alabama")).values.head)
-
-  print("Georgia => ")
-  println(solvedMap(Variable("Georgia")).values.head)
-  
-  print("Florida => ")
-  println(solvedMap(Variable("Florida")).values.head)
-
-  print("South Carolina => ")
-  println(solvedMap(Variable("South Carolina")).values.head)
-
-  print("North Carolina => ")
-  println(solvedMap(Variable("North Carolina")).values.head)
-
-  print("Virginia => ")
-  println(solvedMap(Variable("Virginia")).values.head)
-
-  print("Wesc Virginia => ")
-  println(solvedMap(Variable("Wesc Virginia")).values.head)
-  
-  print("Maryland => ")
-  println(solvedMap(Variable("Maryland")).values.head)
-
-  print("Delaware => ")
-  println(solvedMap(Variable("Delaware")).values.head)
-
-  print("New Jersey => ")
-  println(solvedMap(Variable("New Jersey")).values.head)
-
-  print("Pennsylvania => ")
-  println(solvedMap(Variable("Pennsylvania")).values.head)
-
-  print("Connecticut => ")
-  println(solvedMap(Variable("Connecticut")).values.head)
-
-  print("Rhode Island => ")
-  println(solvedMap(Variable("Rhode Island")).values.head)
-
-  print("Massachusetts => ")
-  println(solvedMap(Variable("Massachusetts")).values.head)
-
-  print("New York => ")
-  println(solvedMap(Variable("New York")).values.head)
-
-  print("Vermont => ")
-  println(solvedMap(Variable("Vermont")).values.head)
-
-  print("New Hampshire => ")
-  println(solvedMap(Variable("New Hampshire")).values.head)
-
-  print("Maine => ")
-  println(solvedMap(Variable("Maine")).values.head)
-  
+  for (state <- list_states){
+    print(s"$state => ")
+    println(solvedMap(Variable(s"$state")).values.head)
+  }
