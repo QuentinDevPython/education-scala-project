@@ -11,7 +11,7 @@ def mapColoring(): Unit =
 
 def askDifficultyColoring(): String =
   println("Choisissez le niveau de la carte à résoudre :")
-  println("- Facile - L'Australie' (A)")
+  println("- Facile - L'Australie (A)")
   println("- Medium - Les Etats-Unis (EU)")
   String(readLine())
 
@@ -22,19 +22,17 @@ def launchChosenMap(difficulty: String): Unit =
   if (difficulty == "A") {
     println("Résolution de la carte Australie ...")
 
-    val mapColoringCsp: CSP[String] = initializeMapColoringAustralia()
-
     val list_australia_states: List[String] = List[String](
       "Western Australia", "Northern Territory", "South Australia",
       "Queensland", "New South Wales", "Victoria", "Tasmania"
     )
 
+    val mapColoringCsp: CSP[String] = initializeMapColoringAustralia(list_australia_states: List[String])
+
     solveAndPrintMapColoring(list_australia_states: List[String], mapColoringCsp: CSP[String])
   }
   else if (difficulty == "EU"){
     println("Résolution de la carte Etats-Unis ...")
-
-    val mapColoringCsp: CSP[String] = initializeMapColoringUnitedStates()
 
     val list_united_states: List[String] = List[String](
       "Washington", "Oregon", "California", "Nevada", "Idaho",
@@ -51,6 +49,8 @@ def launchChosenMap(difficulty: String): Unit =
       "New Hampshire", "Maine"
     )
 
+    val mapColoringCsp: CSP[String] = initializeMapColoringUnitedStates(list_united_states: List[String])
+
     solveAndPrintMapColoring(list_united_states: List[String], mapColoringCsp: CSP[String])
   }
   else {
@@ -60,393 +60,296 @@ def launchChosenMap(difficulty: String): Unit =
   }
 
 
-def initializeMapColoringAustralia(): CSP[String] =
+def initializeMapColoringAustralia(list_australia_states: List[String]): CSP[String] =
 
   // Possible colors
   val colorsDomain: Domain[String] = Domain[String](Set("Red", "Green", "Blue"))
 
-  // Here we declare all the Australia states
-  val westernAustralia = Variable[String]("Western Australia")
-  val northernTerritory = Variable[String]("Northern Territory")
-  val southAustralia = Variable[String]("South Australia")
-  val queensland = Variable[String]("Queensland")
-  val newSouthWales = Variable[String]("New South Wales")
-  val victoria = Variable[String]("Victoria")
-  val tasmania = Variable[String]("Tasmania")
+  var mapStateWithVariable: Map[String, Variable[String]] = Map[String, Variable[String]]()
+
+  for (stateName <- list_australia_states){
+    mapStateWithVariable = mapStateWithVariable + (stateName -> Variable[String](stateName))
+  }
+
+  var mapStateWithColorDomain:  Map[Variable[String], Domain[String]] = Map()
+
+  for (stateVariable <- mapStateWithVariable.values){
+    mapStateWithColorDomain = mapStateWithColorDomain + (stateVariable -> colorsDomain)
+  }
 
   val mapColoringCsp: CSP[String] =
     CSP(
-      domains =
+      domains = mapStateWithColorDomain,
       // Each variable is bound to the same domain
-        Map(
-          westernAustralia -> colorsDomain,
-          northernTerritory -> colorsDomain,
-          southAustralia -> colorsDomain,
-          queensland -> colorsDomain,
-          newSouthWales -> colorsDomain,
-          victoria -> colorsDomain,
-          tasmania -> colorsDomain,
-        ),
       constraints =
         List(
-          // Constraints we can fix
-          Constraint.EqualConstant(southAustralia, "Blue"),
-          Constraint.EqualConstant(queensland, "Red"),
-          Constraint.EqualVariables(tasmania, queensland),
+          // Constraints we can fix manually to avoid multiple solutions
+          Constraint.EqualConstant(mapStateWithVariable("South Australia"), "Blue"),
+          Constraint.EqualConstant(mapStateWithVariable("Queensland"), "Red"),
+          Constraint.EqualVariables(mapStateWithVariable("Tasmania"), mapStateWithVariable("Queensland")),
 
           // Constraints to solve the map coloring
-          Constraint.DiffVariables(westernAustralia, northernTerritory),
-          Constraint.DiffVariables(westernAustralia, southAustralia),
+          Constraint.DiffVariables(mapStateWithVariable("Western Australia"), mapStateWithVariable("Northern Territory")),
+          Constraint.DiffVariables(mapStateWithVariable("Western Australia"), mapStateWithVariable("South Australia")),
 
-          Constraint.DiffVariables(northernTerritory, southAustralia),
-          Constraint.DiffVariables(northernTerritory, queensland),
+          Constraint.DiffVariables(mapStateWithVariable("Northern Territory"), mapStateWithVariable("South Australia")),
+          Constraint.DiffVariables(mapStateWithVariable("Northern Territory"), mapStateWithVariable("Queensland")),
 
-          Constraint.DiffVariables(queensland, southAustralia),
-          Constraint.DiffVariables(queensland, newSouthWales),
+          Constraint.DiffVariables(mapStateWithVariable("Queensland"), mapStateWithVariable("South Australia")),
+          Constraint.DiffVariables(mapStateWithVariable("Queensland"), mapStateWithVariable("New South Wales")),
 
-          Constraint.DiffVariables(newSouthWales, southAustralia),
-          Constraint.DiffVariables(newSouthWales, victoria),
+          Constraint.DiffVariables(mapStateWithVariable("New South Wales"), mapStateWithVariable("South Australia")),
+          Constraint.DiffVariables(mapStateWithVariable("New South Wales"), mapStateWithVariable("Victoria")),
 
-          Constraint.DiffVariables(victoria, southAustralia),
+          Constraint.DiffVariables(mapStateWithVariable("Victoria"), mapStateWithVariable("South Australia")),
         )
     )
   mapColoringCsp
 
 
-def initializeMapColoringUnitedStates(): CSP[String] =
+def initializeMapColoringUnitedStates(list_united_states: List[String]): CSP[String] =
 
   // Possible colors
   val colorsDomain: Domain[String] = Domain[String](Set("Red", "Green", "Blue", "Yellow"))
 
-  // Here we declare all the United states
-  val washington = Variable[String]("Washington")
-  val oregon = Variable[String]("Oregon")
-  val california = Variable[String]("California")
-  val nevada = Variable[String]("Nevada")
-  val idaho = Variable[String]("Idaho")
-  val montana = Variable[String]("Montana")
-  val wyoming = Variable[String]("Wyoming")
-  val utah = Variable[String]("Utah")
-  val colorado = Variable[String]("Colorado")
-  val arizona = Variable[String]("Arizona")
-  val newMexico = Variable[String]("New Mexico")
-  val northDakota = Variable[String]("North Dakota")
-  val southDakota = Variable[String]("South Dakota")
-  val nebraska = Variable[String]("Nebraska")
-  val kansas = Variable[String]("Kansas")
-  val oklahoma = Variable[String]("Oklahoma")
-  val texas = Variable[String]("Texas")
-  val minnesota = Variable[String]("Minnesota")
-  val iowa = Variable[String]("Iowa")
-  val missouri = Variable[String]("Missouri")
-  val arkansas = Variable[String]("Arkansas")
-  val louisiana = Variable[String]("Louisiana")
-  val wisconsia = Variable[String]("Wisconsia")
-  val michigan = Variable[String]("Michigan")
-  val illinois = Variable[String]("Illinois")
-  val indiana = Variable[String]("Indiana")
-  val ohio = Variable[String]("Ohio")
-  val kentucky = Variable[String]("Kentucky")
-  val tennessee = Variable[String]("Tennessee")
-  val mississippi = Variable[String]("Mississippi")
-  val alabama = Variable[String]("Alabama")
-  val georgia = Variable[String]("Georgia")
-  val florida = Variable[String]("Florida")
-  val southCarolina = Variable[String]("South Carolina")
-  val northCarolina = Variable[String]("North Carolina")
-  val virginia = Variable[String]("Virginia")
-  val wescVirginia = Variable[String]("Wesc Virginia")
-  val maryland = Variable[String]("Maryland")
-  val delaware = Variable[String]("Delaware")
-  val newJersey = Variable[String]("New Jersey")
-  val pennsylvania = Variable[String]("Pennsylvania")
-  val connecticut = Variable[String]("Connecticut")
-  val rhodeIsland = Variable[String]("Rhode Island")
-  val massachusetts = Variable[String]("Massachusetts")
-  val newYork = Variable[String]("New York")
-  val vermont = Variable[String]("Vermont")
-  val newHampshire = Variable[String]("New Hampshire")
-  val maine = Variable[String]("Maine")
+  var mapStateWithVariable: Map[String, Variable[String]] = Map[String, Variable[String]]()
+
+  for (stateName <- list_united_states){
+    mapStateWithVariable = mapStateWithVariable + (stateName -> Variable[String](stateName))
+  }
+
+  var mapStateWithColorDomain:  Map[Variable[String], Domain[String]] = Map()
+
+  for (stateVariable <- mapStateWithVariable.values){
+    mapStateWithColorDomain = mapStateWithColorDomain + (stateVariable -> colorsDomain)
+  }
 
   val mapColoringCsp: CSP[String] =
     CSP(
-      domains =
-      // Each variable is bound to the same domain
-        Map(
-          washington -> colorsDomain,
-          oregon -> colorsDomain,
-          california -> colorsDomain,
-          nevada -> colorsDomain,
-          idaho -> colorsDomain,
-          montana -> colorsDomain,
-          wyoming -> colorsDomain,
-          utah -> colorsDomain,
-          colorado -> colorsDomain,
-          arizona -> colorsDomain,
-          newMexico -> colorsDomain,
-          northDakota -> colorsDomain,
-          southDakota -> colorsDomain,
-          nebraska -> colorsDomain,
-          kansas -> colorsDomain,
-          oklahoma -> colorsDomain,
-          texas -> colorsDomain,
-          minnesota -> colorsDomain,
-          iowa -> colorsDomain,
-          missouri -> colorsDomain,
-          arkansas -> colorsDomain,
-          louisiana -> colorsDomain,
-          wisconsia -> colorsDomain,
-          michigan -> colorsDomain,
-          illinois -> colorsDomain,
-          indiana -> colorsDomain,
-          ohio -> colorsDomain,
-          kentucky -> colorsDomain,
-          tennessee -> colorsDomain,
-          mississippi -> colorsDomain,
-          alabama -> colorsDomain,
-          georgia -> colorsDomain,
-          florida -> colorsDomain,
-          southCarolina -> colorsDomain,
-          northCarolina -> colorsDomain,
-          virginia -> colorsDomain,
-          wescVirginia -> colorsDomain,
-          maryland -> colorsDomain,
-          delaware -> colorsDomain,
-          newJersey -> colorsDomain,
-          pennsylvania -> colorsDomain,
-          connecticut -> colorsDomain,
-          rhodeIsland -> colorsDomain,
-          massachusetts -> colorsDomain,
-          newYork -> colorsDomain,
-          vermont -> colorsDomain,
-          newHampshire -> colorsDomain,
-          maine -> colorsDomain,
-        ),
+      domains = mapStateWithColorDomain,
+    
       constraints =
         List(
           // Constraints we can fix manually to avoid multiple solutions
-          Constraint.EqualConstant(arizona, "Green"),
-          Constraint.EqualConstant(kansas, "Red"),
-          Constraint.EqualVariables(arizona, ohio),
-          Constraint.EqualConstant(oregon, "Blue"),
-          Constraint.EqualConstant(southDakota, "Yellow"),
-          Constraint.EqualConstant(newYork, "Blue"),
-          Constraint.EqualConstant(montana, "Green"),
-          Constraint.EqualConstant(arkansas, "Green"),
-          Constraint.EqualConstant(georgia, "Yellow"),
-          Constraint.EqualConstant(delaware, "Blue"),
-          Constraint.EqualConstant(wisconsia, "Green"),
-          Constraint.EqualConstant(northCarolina, "Red"),
-          Constraint.EqualConstant(rhodeIsland, "Red"),
-          Constraint.EqualConstant(utah, "Blue"),
-          Constraint.EqualConstant(newJersey, "Yellow"),
-          Constraint.EqualConstant(newHampshire, "Yellow"),
-          Constraint.EqualConstant(alabama, "Green"),
-          Constraint.EqualConstant(illinois, "Blue"),
-          Constraint.EqualConstant(michigan, "Blue"),
-          Constraint.EqualConstant(wescVirginia, "Blue"),
-          Constraint.EqualConstant(virginia, "Green"),
-          Constraint.EqualConstant(louisiana, "Red"),
+          // Green
+          Constraint.EqualConstant(mapStateWithVariable("Arizona"), "Green"),
+          Constraint.EqualVariables(mapStateWithVariable("Ohio"), mapStateWithVariable("Arizona")),
+          Constraint.EqualVariables(mapStateWithVariable("Montana"), mapStateWithVariable("Arizona")),
+          Constraint.EqualVariables(mapStateWithVariable("Arkansas"), mapStateWithVariable("Arizona")),
+          Constraint.EqualVariables(mapStateWithVariable("Alabama"), mapStateWithVariable("Arizona")),
+          Constraint.EqualVariables(mapStateWithVariable("Wisconsia"), mapStateWithVariable("Arizona")),
+          Constraint.EqualVariables(mapStateWithVariable("Virginia"), mapStateWithVariable("Arizona")),
+          // Red
+          Constraint.EqualConstant(mapStateWithVariable("North Carolina"), "Red"),
+          Constraint.EqualVariables(mapStateWithVariable("Rhode Island"), mapStateWithVariable("North Carolina")),
+          Constraint.EqualVariables(mapStateWithVariable("Kansas"), mapStateWithVariable("North Carolina")),
+          Constraint.EqualVariables(mapStateWithVariable("Louisiana"), mapStateWithVariable("North Carolina")),
+          // Blue
+          Constraint.EqualConstant(mapStateWithVariable("Oregon"), "Blue"),
+          Constraint.EqualVariables(mapStateWithVariable("New York"), mapStateWithVariable("Oregon")),
+          Constraint.EqualVariables(mapStateWithVariable("Delaware"), mapStateWithVariable("Oregon")),
+          Constraint.EqualVariables(mapStateWithVariable("Utah"), mapStateWithVariable("Oregon")),
+          Constraint.EqualVariables(mapStateWithVariable("Illinois"), mapStateWithVariable("Oregon")),
+          Constraint.EqualVariables(mapStateWithVariable("Michigan"), mapStateWithVariable("Oregon")),
+          Constraint.EqualVariables(mapStateWithVariable("Wesc Virginia"), mapStateWithVariable("Oregon")),
+          // Yellow
+          Constraint.EqualConstant(mapStateWithVariable("New Jersey"), "Yellow"),
+          Constraint.EqualVariables(mapStateWithVariable("New Hampshire"), mapStateWithVariable("New Jersey")),
+          Constraint.EqualVariables(mapStateWithVariable("Georgia"), mapStateWithVariable("New Jersey")),
+          Constraint.EqualVariables(mapStateWithVariable("South Dakota"), mapStateWithVariable("New Jersey")),
 
           // Constraints to solve the map coloring
 
           // Washington
-          Constraint.DiffVariables(washington, oregon),
-          Constraint.DiffVariables(washington, idaho),
-
+          Constraint.DiffVariables(mapStateWithVariable("Washington"), mapStateWithVariable("Oregon")),
+          Constraint.DiffVariables(mapStateWithVariable("Washington"), mapStateWithVariable("Idaho")),
           // Oregon
-          Constraint.DiffVariables(oregon, idaho),
-          Constraint.DiffVariables(oregon, california),
-          Constraint.DiffVariables(oregon, nevada),
-
+          Constraint.DiffVariables(mapStateWithVariable("Oregon"), mapStateWithVariable("Idaho")),
+          Constraint.DiffVariables(mapStateWithVariable("Oregon"), mapStateWithVariable("California")),
+          Constraint.DiffVariables(mapStateWithVariable("Oregon"), mapStateWithVariable("Nevada")),
           // California
-          Constraint.DiffVariables(california, nevada),
-          Constraint.DiffVariables(california, arizona),
-
+          Constraint.DiffVariables(mapStateWithVariable("California"), mapStateWithVariable("Nevada")),
+          Constraint.DiffVariables(mapStateWithVariable("California"), mapStateWithVariable("Arizona")),
           // Oregon
-          Constraint.DiffVariables(oregon, nevada),
-
+          Constraint.DiffVariables(mapStateWithVariable("Oregon"), mapStateWithVariable("Nevada")),
           // Nevada
-          Constraint.DiffVariables(nevada, idaho),
-          Constraint.DiffVariables(nevada, utah),
-          Constraint.DiffVariables(nevada, arizona),
-
+          Constraint.DiffVariables(mapStateWithVariable("Nevada"), mapStateWithVariable("Idaho")),
+          Constraint.DiffVariables(mapStateWithVariable("Nevada"), mapStateWithVariable("Utah")),
+          Constraint.DiffVariables(mapStateWithVariable("Nevada"), mapStateWithVariable("Arizona")),
           // Idaho
-          Constraint.DiffVariables(idaho, montana),
-          Constraint.DiffVariables(idaho, wyoming),
-          Constraint.DiffVariables(idaho, utah),
-
+          Constraint.DiffVariables(mapStateWithVariable("Idaho"), mapStateWithVariable("Montana")),
+          Constraint.DiffVariables(mapStateWithVariable("Idaho"), mapStateWithVariable("Wyoming")),
+          Constraint.DiffVariables(mapStateWithVariable("Idaho"), mapStateWithVariable("Utah")),
           // Utah
-          Constraint.DiffVariables(utah, arizona),
-          Constraint.DiffVariables(utah, wyoming),
-          Constraint.DiffVariables(utah, colorado),
-          Constraint.DiffVariables(utah, newMexico),
-
+          Constraint.DiffVariables(mapStateWithVariable("Utah"), mapStateWithVariable("Arizona")),
+          Constraint.DiffVariables(mapStateWithVariable("Utah"), mapStateWithVariable("Wyoming")),
+          Constraint.DiffVariables(mapStateWithVariable("Utah"), mapStateWithVariable("Colorado")),
+          Constraint.DiffVariables(mapStateWithVariable("Utah"), mapStateWithVariable("New Mexico")),
           // Arizona
-          Constraint.DiffVariables(arizona, colorado),
-          Constraint.DiffVariables(arizona, newMexico),
+          Constraint.DiffVariables(mapStateWithVariable("Arizona"), mapStateWithVariable("Colorado")),
+          Constraint.DiffVariables(mapStateWithVariable("Arizona"), mapStateWithVariable("New Mexico")),
 
           // Montana
-          Constraint.DiffVariables(montana, wyoming),
-          Constraint.DiffVariables(montana, northDakota),
-          Constraint.DiffVariables(montana, southDakota),
+          Constraint.DiffVariables(mapStateWithVariable("Montana"), mapStateWithVariable("Wyoming")),
+          Constraint.DiffVariables(mapStateWithVariable("Montana"), mapStateWithVariable("North Dakota")),
+          Constraint.DiffVariables(mapStateWithVariable("Montana"), mapStateWithVariable("South Dakota")),
 
           // Wyoming
-          Constraint.DiffVariables(wyoming, colorado),
-          Constraint.DiffVariables(wyoming, southDakota),
-          Constraint.DiffVariables(wyoming, nebraska),
+          Constraint.DiffVariables(mapStateWithVariable("Wyoming"), mapStateWithVariable("Colorado")),
+          Constraint.DiffVariables(mapStateWithVariable("Wyoming"), mapStateWithVariable("South Dakota")),
+          Constraint.DiffVariables(mapStateWithVariable("Wyoming"), mapStateWithVariable("Nebraska")),
 
           // Colorado
-          Constraint.DiffVariables(colorado, newMexico),
-          Constraint.DiffVariables(colorado, nebraska),
-          Constraint.DiffVariables(colorado, kansas),
-          Constraint.DiffVariables(colorado, oklahoma),
+          Constraint.DiffVariables(mapStateWithVariable("Colorado"), mapStateWithVariable("New Mexico")),
+          Constraint.DiffVariables(mapStateWithVariable("Colorado"), mapStateWithVariable("Nebraska")),
+          Constraint.DiffVariables(mapStateWithVariable("Colorado"), mapStateWithVariable("Kansas")),
+          Constraint.DiffVariables(mapStateWithVariable("Colorado"), mapStateWithVariable("Oklahoma")),
 
           // New Mexico
-          Constraint.DiffVariables(newMexico, oklahoma),
-          Constraint.DiffVariables(newMexico, texas),
+          Constraint.DiffVariables(mapStateWithVariable("New Mexico"), mapStateWithVariable("Oklahoma")),
+          Constraint.DiffVariables(mapStateWithVariable("New Mexico"), mapStateWithVariable("Texas")),
 
           // North Dakota
-          Constraint.DiffVariables(northDakota, southDakota),
-          Constraint.DiffVariables(northDakota, minnesota),
+          Constraint.DiffVariables(mapStateWithVariable("North Dakota"), mapStateWithVariable("South Dakota")),
+          Constraint.DiffVariables(mapStateWithVariable("North Dakota"), mapStateWithVariable("Minnesota")),
 
           // South Dakota
-          Constraint.DiffVariables(southDakota, nebraska),
-          Constraint.DiffVariables(southDakota, minnesota),
-          Constraint.DiffVariables(southDakota, iowa),
+          Constraint.DiffVariables(mapStateWithVariable("South Dakota"), mapStateWithVariable("Nebraska")),
+          Constraint.DiffVariables(mapStateWithVariable("South Dakota"), mapStateWithVariable("Minnesota")),
+          Constraint.DiffVariables(mapStateWithVariable("South Dakota"), mapStateWithVariable("Iowa")),
 
           // Kansas
-          Constraint.DiffVariables(kansas, missouri),
-          Constraint.DiffVariables(kansas, oklahoma),
+          Constraint.DiffVariables(mapStateWithVariable("Kansas"), mapStateWithVariable("Missouri")),
+          Constraint.DiffVariables(mapStateWithVariable("Kansas"), mapStateWithVariable("Oklahoma")),
 
           // Oklahoma
-          Constraint.DiffVariables(oklahoma, missouri),
-          Constraint.DiffVariables(oklahoma, arkansas),
-          Constraint.DiffVariables(oklahoma, texas),
+          Constraint.DiffVariables(mapStateWithVariable("Oklahoma"), mapStateWithVariable("Missouri")),
+          Constraint.DiffVariables(mapStateWithVariable("Oklahoma"), mapStateWithVariable("Arkansas")),
+          Constraint.DiffVariables(mapStateWithVariable("Oklahoma"), mapStateWithVariable("Texas")),
 
           // Texas
-          Constraint.DiffVariables(texas, arkansas),
-          Constraint.DiffVariables(texas, louisiana),
+          Constraint.DiffVariables(mapStateWithVariable("Texas"), mapStateWithVariable("Arkansas")),
+          Constraint.DiffVariables(mapStateWithVariable("Texas"), mapStateWithVariable("Louisiana")),
 
           // Minnesota
-          Constraint.DiffVariables(minnesota, wisconsia),
-          Constraint.DiffVariables(minnesota, iowa),
+          Constraint.DiffVariables(mapStateWithVariable("Minnesota"), mapStateWithVariable("Wisconsia")),
+          Constraint.DiffVariables(mapStateWithVariable("Minnesota"), mapStateWithVariable("Iowa")),
 
           // Iowa
-          Constraint.DiffVariables(iowa, wisconsia),
-          Constraint.DiffVariables(iowa, illinois),
-          Constraint.DiffVariables(iowa, missouri),
+          Constraint.DiffVariables(mapStateWithVariable("Iowa"), mapStateWithVariable("Wisconsia")),
+          Constraint.DiffVariables(mapStateWithVariable("Iowa"), mapStateWithVariable("Illinois")),
+          Constraint.DiffVariables(mapStateWithVariable("Iowa"), mapStateWithVariable("Missouri")),
 
           // Missouri
-          Constraint.DiffVariables(missouri, illinois),
-          Constraint.DiffVariables(missouri, kentucky),
-          Constraint.DiffVariables(missouri, tennessee),
-          Constraint.DiffVariables(missouri, arkansas),
+          Constraint.DiffVariables(mapStateWithVariable("Missouri"), mapStateWithVariable("Illinois")),
+          Constraint.DiffVariables(mapStateWithVariable("Missouri"), mapStateWithVariable("Kentucky")),
+          Constraint.DiffVariables(mapStateWithVariable("Missouri"), mapStateWithVariable("Tennessee")),
+          Constraint.DiffVariables(mapStateWithVariable("Missouri"), mapStateWithVariable("Arkansas")),
 
           // Arkansas
-          Constraint.DiffVariables(arkansas, tennessee),
-          Constraint.DiffVariables(arkansas, mississippi),
-          Constraint.DiffVariables(arkansas, louisiana),
+          Constraint.DiffVariables(mapStateWithVariable("Arkansas"), mapStateWithVariable("Tennessee")),
+          Constraint.DiffVariables(mapStateWithVariable("Arkansas"), mapStateWithVariable("Mississippi")),
+          Constraint.DiffVariables(mapStateWithVariable("Arkansas"), mapStateWithVariable("Louisiana")),
 
           // Louisiana
-          Constraint.DiffVariables(louisiana, mississippi),
+          Constraint.DiffVariables(mapStateWithVariable("Louisiana"), mapStateWithVariable("Mississippi")),
 
           // Wisconsia
-          Constraint.DiffVariables(wisconsia, michigan),
-          Constraint.DiffVariables(wisconsia, illinois),
+          Constraint.DiffVariables(mapStateWithVariable("Wisconsia"), mapStateWithVariable("Michigan")),
+          Constraint.DiffVariables(mapStateWithVariable("Wisconsia"), mapStateWithVariable("Illinois")),
 
           // Illinois
-          Constraint.DiffVariables(illinois, indiana),
-          Constraint.DiffVariables(illinois, kentucky),
+          Constraint.DiffVariables(mapStateWithVariable("Illinois"), mapStateWithVariable("Indiana")),
+          Constraint.DiffVariables(mapStateWithVariable("Illinois"), mapStateWithVariable("Kentucky")),
 
           // Michigan
-          Constraint.DiffVariables(michigan, indiana),
-          Constraint.DiffVariables(michigan, ohio),
+          Constraint.DiffVariables(mapStateWithVariable("Michigan"), mapStateWithVariable("Indiana")),
+          Constraint.DiffVariables(mapStateWithVariable("Michigan"), mapStateWithVariable("Ohio")),
 
           // Indiana
-          Constraint.DiffVariables(indiana, ohio),
-          Constraint.DiffVariables(indiana, kentucky),
+          Constraint.DiffVariables(mapStateWithVariable("Indiana"), mapStateWithVariable("Ohio")),
+          Constraint.DiffVariables(mapStateWithVariable("Indiana"), mapStateWithVariable("Kentucky")),
 
           // Ohio
-          Constraint.DiffVariables(ohio, pennsylvania),
-          Constraint.DiffVariables(ohio, wescVirginia),
-          Constraint.DiffVariables(ohio, kentucky),
+          Constraint.DiffVariables(mapStateWithVariable("Ohio"), mapStateWithVariable("Pennsylvania")),
+          Constraint.DiffVariables(mapStateWithVariable("Ohio"), mapStateWithVariable("Wesc Virginia")),
+          Constraint.DiffVariables(mapStateWithVariable("Ohio"), mapStateWithVariable("Kentucky")),
 
           // Kentucky
-          Constraint.DiffVariables(kentucky, wescVirginia),
-          Constraint.DiffVariables(kentucky, virginia),
-          Constraint.DiffVariables(kentucky, tennessee),
+          Constraint.DiffVariables(mapStateWithVariable("Kentucky"), mapStateWithVariable("Wesc Virginia")),
+          Constraint.DiffVariables(mapStateWithVariable("Kentucky"), mapStateWithVariable("Virginia")),
+          Constraint.DiffVariables(mapStateWithVariable("Kentucky"), mapStateWithVariable("Tennessee")),
 
           // Tennessee
-          Constraint.DiffVariables(tennessee, virginia),
-          Constraint.DiffVariables(tennessee, northCarolina),
-          Constraint.DiffVariables(tennessee, georgia),
-          Constraint.DiffVariables(tennessee, alabama),
-          Constraint.DiffVariables(tennessee, mississippi),
+          Constraint.DiffVariables(mapStateWithVariable("Tennessee"), mapStateWithVariable("Virginia")),
+          Constraint.DiffVariables(mapStateWithVariable("Tennessee"), mapStateWithVariable("North Carolina")),
+          Constraint.DiffVariables(mapStateWithVariable("Tennessee"), mapStateWithVariable("Georgia")),
+          Constraint.DiffVariables(mapStateWithVariable("Tennessee"), mapStateWithVariable("Alabama")),
+          Constraint.DiffVariables(mapStateWithVariable("Tennessee"), mapStateWithVariable("Mississippi")),
 
           // Mississippi
-          Constraint.DiffVariables(mississippi, alabama),
+          Constraint.DiffVariables(mapStateWithVariable("Mississippi"), mapStateWithVariable("Alabama")),
 
           // Alabama
-          Constraint.DiffVariables(alabama, georgia),
-          Constraint.DiffVariables(alabama, florida),
+          Constraint.DiffVariables(mapStateWithVariable("Alabama"), mapStateWithVariable("Georgia")),
+          Constraint.DiffVariables(mapStateWithVariable("Alabama"), mapStateWithVariable("Florida")),
 
           // Florida
-          Constraint.DiffVariables(florida, georgia),
+          Constraint.DiffVariables(mapStateWithVariable("Florida"), mapStateWithVariable("Georgia")),
 
           // Georgia
-          Constraint.DiffVariables(georgia, southCarolina),
+          Constraint.DiffVariables(mapStateWithVariable("Georgia"), mapStateWithVariable("South Carolina")),
 
           // South Carolina
-          Constraint.DiffVariables(southCarolina, northCarolina),
+          Constraint.DiffVariables(mapStateWithVariable("South Carolina"), mapStateWithVariable("North Carolina")),
 
           // North Carolina
-          Constraint.DiffVariables(northCarolina, virginia),
+          Constraint.DiffVariables(mapStateWithVariable("North Carolina"), mapStateWithVariable("Virginia")),
 
           // Virginia
-          Constraint.DiffVariables(virginia, wescVirginia),
-          Constraint.DiffVariables(virginia, maryland),
+          Constraint.DiffVariables(mapStateWithVariable("Virginia"), mapStateWithVariable("Wesc Virginia")),
+          Constraint.DiffVariables(mapStateWithVariable("Virginia"), mapStateWithVariable("Maryland")),
 
           // Wesc Virginia
-          Constraint.DiffVariables(wescVirginia, maryland),
-          Constraint.DiffVariables(wescVirginia, pennsylvania),
+          Constraint.DiffVariables(mapStateWithVariable("Wesc Virginia"), mapStateWithVariable("Maryland")),
+          Constraint.DiffVariables(mapStateWithVariable("Wesc Virginia"), mapStateWithVariable("Pennsylvania")),
 
           // Maryland
-          Constraint.DiffVariables(maryland, pennsylvania),
-          Constraint.DiffVariables(maryland, delaware),
+          Constraint.DiffVariables(mapStateWithVariable("Maryland"), mapStateWithVariable("Pennsylvania")),
+          Constraint.DiffVariables(mapStateWithVariable("Maryland"), mapStateWithVariable("Delaware")),
 
           // Delaware
-          Constraint.DiffVariables(delaware, newJersey),
-          Constraint.DiffVariables(delaware, pennsylvania),
+          Constraint.DiffVariables(mapStateWithVariable("Delaware"), mapStateWithVariable("New Jersey")),
+          Constraint.DiffVariables(mapStateWithVariable("Delaware"), mapStateWithVariable("Pennsylvania")),
 
           // Pennsylvania
-          Constraint.DiffVariables(pennsylvania, newJersey),
-          Constraint.DiffVariables(pennsylvania, newYork),
+          Constraint.DiffVariables(mapStateWithVariable("Pennsylvania"), mapStateWithVariable("New Jersey")),
+          Constraint.DiffVariables(mapStateWithVariable("Pennsylvania"), mapStateWithVariable("New York")),
 
           // New Jersey
-          Constraint.DiffVariables(newJersey, newYork),
+          Constraint.DiffVariables(mapStateWithVariable("New Jersey"), mapStateWithVariable("New York")),
 
           // New York
-          Constraint.DiffVariables(newYork, connecticut),
-          Constraint.DiffVariables(newYork, massachusetts),
-          Constraint.DiffVariables(newYork, vermont),
+          Constraint.DiffVariables(mapStateWithVariable("New York"), mapStateWithVariable("Connecticut")),
+          Constraint.DiffVariables(mapStateWithVariable("New York"), mapStateWithVariable("Massachusetts")),
+          Constraint.DiffVariables(mapStateWithVariable("New York"), mapStateWithVariable("Vermont")),
 
           // Connecticut
-          Constraint.DiffVariables(connecticut, rhodeIsland),
-          Constraint.DiffVariables(connecticut, massachusetts),
+          Constraint.DiffVariables(mapStateWithVariable("Connecticut"), mapStateWithVariable("Rhode Island")),
+          Constraint.DiffVariables(mapStateWithVariable("Connecticut"), mapStateWithVariable("Massachusetts")),
 
           // Rhode Island
-          Constraint.DiffVariables(rhodeIsland, massachusetts),
+          Constraint.DiffVariables(mapStateWithVariable("Rhode Island"), mapStateWithVariable("Massachusetts")),
 
           // Massachussets
-          Constraint.DiffVariables(massachusetts, vermont),
-          Constraint.DiffVariables(massachusetts, newHampshire),
+          Constraint.DiffVariables(mapStateWithVariable("Massachusetts"), mapStateWithVariable("Vermont")),
+          Constraint.DiffVariables(mapStateWithVariable("Massachusetts"), mapStateWithVariable("New Hampshire")),
 
           // Vermont
-          Constraint.DiffVariables(vermont, newHampshire),
+          Constraint.DiffVariables(mapStateWithVariable("Vermont"), mapStateWithVariable("New Hampshire")),
 
           // New Hampshire
-          Constraint.DiffVariables(newHampshire, maine),
+          Constraint.DiffVariables(mapStateWithVariable("New Hampshire"), mapStateWithVariable("Maine")),
           
           // Maine
         )
