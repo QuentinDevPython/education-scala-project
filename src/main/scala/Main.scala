@@ -24,7 +24,7 @@ def main: Unit =
       sudoku()
     }
     else if(game == "C"){
-      println("Welcome to the MAP GAME !")
+      println("Welcome to the MAP COLORING GAME !")
       mapColoring()
     }
     else {

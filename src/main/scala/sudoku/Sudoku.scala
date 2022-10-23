@@ -527,7 +527,7 @@ def initializeSudoku(constraintGrid: List[Constraint[Int]]): CSP[Int] =
 
 def solveSudoku(sudokuCsp: CSP[Int]): Unit =
   val solvedSudoku: Map[Variable[Int], Domain[Int]] = sudokuCsp.solve
-  
+
   if solvedSudoku.isEmpty then println("Sudoku impossible à résoudre.\n")
   else
 
