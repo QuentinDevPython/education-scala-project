@@ -28,14 +28,6 @@ def askDifficultySudoku(): String =
   println("- Impossible (I)")
   String(readLine())
 
-
-def equalConstant(listSudokuBoxes: List[String], constant: Int, mapBoxWithVariable: Map[String, Variable[Int]]): List[Constraint[Int]] =
-  var listEqualConstant: List[Constraint[Int]] = List[Constraint[Int]]()
-  for (box <- listSudokuBoxes){
-    listEqualConstant = listEqualConstant ::: List[Constraint[Int]](Constraint.EqualConstant(mapBoxWithVariable(box), constant))
-  }
-  listEqualConstant
-
 // Sudoku grids on : https://sudoku.com/fr/moyen/
 def launchChosenSudoku(difficulty: String, mapBoxWithVariable: Map[String, Variable[Int]]): Unit =
 
@@ -231,69 +223,6 @@ def launchChosenSudoku(difficulty: String, mapBoxWithVariable: Map[String, Varia
   }
 
 
-def allDiffLineVariables(firstBox: Int, mapBoxWithVariable: Map[String, Variable[Int]]): List[Variable[Int]] =
-  var listDiffVariables: List[Variable[Int]] = List[Variable[Int]]()
-  for (number <- firstBox to firstBox + 9-1){
-    listDiffVariables = listDiffVariables ::: List[Variable[Int]](mapBoxWithVariable(s"v$number"))
-  }
-  listDiffVariables
-
-
-def allDiffLines(mapBoxWithVariable: Map[String, Variable[Int]]): List[Constraint[Int]] =
-  var listLinesConstrainsts: List[Constraint[Int]] = List[Constraint[Int]]()
-  for (line <- 1 to 9){
-    listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](Constraint.AllDiff(allDiffLineVariables(line*10+1, mapBoxWithVariable: Map[String, Variable[Int]])))
-  }
-  listLinesConstrainsts
-
-
-def allDiffColumnsVariables(firstBox: Int, mapBoxWithVariable: Map[String, Variable[Int]]): List[Variable[Int]] =
-  var listDiffVariables: List[Variable[Int]] = List[Variable[Int]]()
-  for (number <- 1 to 9){
-    val numberVariable: Int = firstBox + (number-1)*10
-    listDiffVariables = listDiffVariables ::: List[Variable[Int]](mapBoxWithVariable(s"v$numberVariable"))
-  }
-  listDiffVariables
-
-
-def allDiffColumns(mapBoxWithVariable: Map[String, Variable[Int]]): List[Constraint[Int]] =
-  var listLinesConstrainsts: List[Constraint[Int]] = List[Constraint[Int]]()
-  for (column <- 1 to 9){
-    listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](Constraint.AllDiff(allDiffColumnsVariables(column+10, mapBoxWithVariable: Map[String, Variable[Int]])))
-  }
-  listLinesConstrainsts
-
-
-def allDiffCellsVariables(firstBox: Int, mapBoxWithVariable: Map[String, Variable[Int]]): List[Variable[Int]] =
-  var listDiffVariables: List[Variable[Int]] = List[Variable[Int]]()
-  for (iteration <- 1 to 3){
-    val firstNumber = firstBox+10*(iteration-1)
-    for (number <- firstNumber to firstNumber+2){
-      listDiffVariables = listDiffVariables ::: List[Variable[Int]](mapBoxWithVariable(s"v$number"))
-    }
-  }
-  listDiffVariables
-
-def allDiffCells(mapBoxWithVariable: Map[String, Variable[Int]]): List[Constraint[Int]] =
-  var listLinesConstrainsts: List[Constraint[Int]] = List[Constraint[Int]]()
-  for (cell <- 1 to 3){
-    listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](
-      Constraint.AllDiff(allDiffCellsVariables(11+3*(cell-1), mapBoxWithVariable: Map[String, Variable[Int]]))
-    )
-  }
-  for (cell <- 1 to 3){
-    listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](
-      Constraint.AllDiff(allDiffCellsVariables(41+3*(cell-1), mapBoxWithVariable: Map[String, Variable[Int]]))
-      )
-  }
-  for (cell <- 1 to 3){
-    listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](
-      Constraint.AllDiff(allDiffCellsVariables(71+3*(cell-1), mapBoxWithVariable: Map[String, Variable[Int]]))
-    )
-  }
-  listLinesConstrainsts
-
-
 def initializeSudoku(constraintGrid: List[Constraint[Int]], mapBoxWithVariable: Map[String, Variable[Int]]): CSP[Int] =
 
   // Possible values than can take a sudoku box
@@ -328,15 +257,15 @@ def solveSudoku(sudokuCsp: CSP[Int]): Unit =
   if solvedSudoku.isEmpty then println("Sudoku impossible à résoudre.\n")
   else
 
-    val nb_lines: Int = 9
-    val nb_columns: Int = 9
+    val nbLines: Int = 9
+    val nbColumns: Int = 9
 
     println("-----------------------------------------")
     
-    for (x <- 1 to nb_lines) {
+    for (x <- 1 to nbLines) {
       if (x != 1) println()
       print("|| ")
-      for (y <- 1 to nb_columns) {
+      for (y <- 1 to nbColumns) {
         print(solvedSudoku(Variable(s"v$x$y")).values.head)
         if (y % 3 == 0) print(" || ") else print(" | ")
       }
@@ -344,3 +273,74 @@ def solveSudoku(sudokuCsp: CSP[Int]): Unit =
 
     println()
     println("-----------------------------------------")
+
+
+def equalConstant(listSudokuBoxes: List[String], constant: Int, mapBoxWithVariable: Map[String, Variable[Int]]): List[Constraint[Int]] =
+  var listEqualConstant: List[Constraint[Int]] = List[Constraint[Int]]()
+  for (box <- listSudokuBoxes){
+    listEqualConstant = listEqualConstant ::: List[Constraint[Int]](Constraint.EqualConstant(mapBoxWithVariable(box), constant))
+  }
+  listEqualConstant
+
+
+def allDiffLineVariables(firstBox: Int, mapBoxWithVariable: Map[String, Variable[Int]]): List[Variable[Int]] =
+  var listDiffVariables: List[Variable[Int]] = List[Variable[Int]]()
+  for (number <- firstBox to firstBox + 9 - 1) {
+    listDiffVariables = listDiffVariables ::: List[Variable[Int]](mapBoxWithVariable(s"v$number"))
+  }
+  listDiffVariables
+
+
+def allDiffLines(mapBoxWithVariable: Map[String, Variable[Int]]): List[Constraint[Int]] =
+  var listLinesConstrainsts: List[Constraint[Int]] = List[Constraint[Int]]()
+  for (line <- 1 to 9) {
+    listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](Constraint.AllDiff(allDiffLineVariables(line * 10 + 1, mapBoxWithVariable: Map[String, Variable[Int]])))
+  }
+  listLinesConstrainsts
+
+
+def allDiffColumnsVariables(firstBox: Int, mapBoxWithVariable: Map[String, Variable[Int]]): List[Variable[Int]] =
+  var listDiffVariables: List[Variable[Int]] = List[Variable[Int]]()
+  for (number <- 1 to 9) {
+    val numberVariable: Int = firstBox + (number - 1) * 10
+    listDiffVariables = listDiffVariables ::: List[Variable[Int]](mapBoxWithVariable(s"v$numberVariable"))
+  }
+  listDiffVariables
+
+
+def allDiffColumns(mapBoxWithVariable: Map[String, Variable[Int]]): List[Constraint[Int]] =
+  var listLinesConstrainsts: List[Constraint[Int]] = List[Constraint[Int]]()
+  for (column <- 1 to 9) {
+    listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](Constraint.AllDiff(allDiffColumnsVariables(column + 10, mapBoxWithVariable: Map[String, Variable[Int]])))
+  }
+  listLinesConstrainsts
+
+
+def allDiffCellsVariables(firstBox: Int, mapBoxWithVariable: Map[String, Variable[Int]]): List[Variable[Int]] =
+  var listDiffVariables: List[Variable[Int]] = List[Variable[Int]]()
+  for (iteration <- 1 to 3) {
+    val firstNumber = firstBox + 10 * (iteration - 1)
+    for (number <- firstNumber to firstNumber + 2) {
+      listDiffVariables = listDiffVariables ::: List[Variable[Int]](mapBoxWithVariable(s"v$number"))
+    }
+  }
+  listDiffVariables
+
+def allDiffCells(mapBoxWithVariable: Map[String, Variable[Int]]): List[Constraint[Int]] =
+    var listLinesConstrainsts: List[Constraint[Int]] = List[Constraint[Int]]()
+    for (cell <- 1 to 3) {
+      listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](
+        Constraint.AllDiff(allDiffCellsVariables(11 + 3 * (cell - 1), mapBoxWithVariable: Map[String, Variable[Int]]))
+      )
+    }
+    for (cell <- 1 to 3) {
+      listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](
+        Constraint.AllDiff(allDiffCellsVariables(41 + 3 * (cell - 1), mapBoxWithVariable: Map[String, Variable[Int]]))
+      )
+    }
+    for (cell <- 1 to 3) {
+      listLinesConstrainsts = listLinesConstrainsts ::: List[Constraint[Int]](
+        Constraint.AllDiff(allDiffCellsVariables(71 + 3 * (cell - 1), mapBoxWithVariable: Map[String, Variable[Int]]))
+      )
+    }
+    listLinesConstrainsts

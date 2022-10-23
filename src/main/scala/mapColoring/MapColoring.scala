@@ -22,19 +22,19 @@ def launchChosenMap(difficulty: String): Unit =
   if (difficulty == "A") {
     println("Résolution de la carte Australie ...")
 
-    val list_australia_states: List[String] = List[String](
+    val listAustraliaStates: List[String] = List[String](
       "Western Australia", "Northern Territory", "South Australia",
       "Queensland", "New South Wales", "Victoria", "Tasmania"
     )
 
-    val mapColoringCsp: CSP[String] = initializeMapColoringAustralia(list_australia_states: List[String])
+    val mapColoringCsp: CSP[String] = initializeMapColoringAustralia(listAustraliaStates: List[String])
 
-    solveAndPrintMapColoring(list_australia_states: List[String], mapColoringCsp: CSP[String])
+    solveAndPrintMapColoring(listAustraliaStates: List[String], mapColoringCsp: CSP[String])
   }
   else if (difficulty == "EU"){
     println("Résolution de la carte Etats-Unis ...")
 
-    val list_united_states: List[String] = List[String](
+    val listUnitedStates: List[String] = List[String](
       "Washington", "Oregon", "California", "Nevada", "Idaho",
       "Montana", "Wyoming", "Utah", "Colorado", "Arizona",
       "New Mexico", "North Dakota", "South Dakota", "Nebraska",
@@ -49,9 +49,9 @@ def launchChosenMap(difficulty: String): Unit =
       "New Hampshire", "Maine"
     )
 
-    val mapColoringCsp: CSP[String] = initializeMapColoringUnitedStates(list_united_states: List[String])
+    val mapColoringCsp: CSP[String] = initializeMapColoringUnitedStates(listUnitedStates: List[String])
 
-    solveAndPrintMapColoring(list_united_states: List[String], mapColoringCsp: CSP[String])
+    solveAndPrintMapColoring(listUnitedStates: List[String], mapColoringCsp: CSP[String])
   }
   else {
     println("Je n'ai pas compris votre choix.")
@@ -60,14 +60,14 @@ def launchChosenMap(difficulty: String): Unit =
   }
 
 
-def initializeMapColoringAustralia(list_australia_states: List[String]): CSP[String] =
+def initializeMapColoringAustralia(listAustraliaStates: List[String]): CSP[String] =
 
   // Possible colors
   val colorsDomain: Domain[String] = Domain[String](Set("Red", "Green", "Blue"))
 
   var mapStateWithVariable: Map[String, Variable[String]] = Map[String, Variable[String]]()
 
-  for (stateName <- list_australia_states){
+  for (stateName <- listAustraliaStates){
     mapStateWithVariable = mapStateWithVariable + (stateName -> Variable[String](stateName))
   }
 
@@ -107,14 +107,14 @@ def initializeMapColoringAustralia(list_australia_states: List[String]): CSP[Str
   mapColoringCsp
 
 
-def initializeMapColoringUnitedStates(list_united_states: List[String]): CSP[String] =
+def initializeMapColoringUnitedStates(listUnitedStates: List[String]): CSP[String] =
 
   // Possible colors
   val colorsDomain: Domain[String] = Domain[String](Set("Red", "Green", "Blue", "Yellow"))
 
   var mapStateWithVariable: Map[String, Variable[String]] = Map[String, Variable[String]]()
 
-  for (stateName <- list_united_states){
+  for (stateName <- listUnitedStates){
     mapStateWithVariable = mapStateWithVariable + (stateName -> Variable[String](stateName))
   }
 
@@ -357,12 +357,12 @@ def initializeMapColoringUnitedStates(list_united_states: List[String]): CSP[Str
   mapColoringCsp
 
 
-def solveAndPrintMapColoring(list_states: List[String], mapColoringCsp: CSP[String]): Unit=
+def solveAndPrintMapColoring(listStates: List[String], mapColoringCsp: CSP[String]): Unit=
 
   val solvedMap: Map[Variable[String], Domain[String]] = mapColoringCsp.solve
 
   println()
-  for (state <- list_states){
+  for (state <- listStates){
     print(s"$state => ")
     println(solvedMap(Variable(s"$state")).values.head)
   }
