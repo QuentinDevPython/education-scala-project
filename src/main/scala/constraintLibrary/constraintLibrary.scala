@@ -36,7 +36,7 @@ case class CSP[A](domains: Map[Variable[A], Domain[A]], constraints: List[Constr
   }
 
   def solve: Map[Variable[A], Domain[A]] =
-    println(s"Contraintes restantes : ${constraints.size}")
+    //println(s"Contraintes restantes : ${constraints.size}")
     val constraint: Option[Constraint[A]] = constraints.find(c => !isSatisfied(c)) // Cherche la première contrainte non satisfaite
 
     constraint match
