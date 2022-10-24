@@ -26,6 +26,8 @@ def launchChosenMap(difficulty: String): Unit =
       "Western Australia", "Northern Territory", "South Australia",
       "Queensland", "New South Wales", "Victoria", "Tasmania"
     )
+    val mapColoringCsp: CSP[String] = initializeMapColoringAustralia(listStates: List[String])
+    solveAndPrintMapColoring(listStates: List[String], mapColoringCsp: CSP[String])
   }
   else if (difficulty == "EU"){
     println("Résolution de la carte Etats-Unis ...")
@@ -44,14 +46,14 @@ def launchChosenMap(difficulty: String): Unit =
       "Rhode Island", "Massachusetts", "New York", "Vermont",
       "New Hampshire", "Maine"
     )
+    val mapColoringCsp: CSP[String] = initializeMapColoringAustralia(listStates: List[String])
+    solveAndPrintMapColoring(listStates: List[String], mapColoringCsp: CSP[String])
   }
   else {
     println("Je n'ai pas compris votre choix.")
     val difficulty: String = askDifficultyColoring()
     launchChosenMap(difficulty: String)
   }
-  val mapColoringCsp: CSP[String] = initializeMapColoringAustralia(listStates: List[String])
-  solveAndPrintMapColoring(listStates: List[String], mapColoringCsp: CSP[String])
 
 
 def initializeMapColoringAustralia(listAustraliaStates: List[String]): CSP[String] =
