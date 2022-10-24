@@ -1,15 +1,14 @@
 import scala.io.StdIn.readLine
 
-import constraintLibrary.*
 import sudoku.sudoku
 import mapColoring.mapColoring
 
 @main
 def main: Unit =
 
-  def launchGameSolver() =
+  def launchGameSolver(): Unit =
     val game: String = askGame()
-    launchChosenGame(game)
+    launchChosenGame(game: String)
 
   // Demander à l'utilisateur le jeu qu'il souhaite résoudre
   def askGame(): String =
@@ -30,6 +29,7 @@ def main: Unit =
     else {
       println("Je n'ai pas compris votre choix.")
       val game: String = askGame()
+      launchChosenGame(game: String)
     }
 
   launchGameSolver()
