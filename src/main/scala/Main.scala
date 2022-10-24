@@ -3,6 +3,7 @@ import scala.io.StdIn.readLine
 import sudoku.sudoku
 import mapColoring.mapColoring
 
+
 @main
 def main: Unit =
 
